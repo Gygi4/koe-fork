@@ -1,12 +1,15 @@
 package moe.kyokobot.koe.crypto;
 
 import io.netty.buffer.ByteBuf;
+import moe.kyokobot.koe.internal.util.AudioPacket;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 public interface EncryptionMode {
     boolean box(ByteBuf opus, int start, ByteBuf output, byte[] secretKey);
+
+    AudioPacket open(ByteBuf packet, byte[] secretKey);
 
     String getName();
 
