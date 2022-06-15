@@ -115,6 +115,7 @@ public class MediaGatewayV5Connection extends AbstractMediaGatewayConnection {
                 break;
             }
             case Op.RESUMED: {
+                connectAttempt = 0;
                 logger.debug("Resumed successfully");
                 break;
             }
