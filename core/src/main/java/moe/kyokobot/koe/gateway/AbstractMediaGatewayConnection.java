@@ -125,11 +125,11 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
 
             if (connectAttempt <= 3) {
                 switch (code) {
-                    case 4009: // Session timeout
-                        resumable = false;
                     case 1001: // Going away or CloudFlare WebSocket proxy restarting
                     case 1006: // Abnormal closure
                     case 4000: // Internal error
+                    case 4009: // Session timeout
+                        resumable = false;
                     case 4015: // Voice server crashed
                     case 4900: // Koe: Reconnect
                         connectFuture = new CompletableFuture<>();
