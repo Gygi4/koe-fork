@@ -33,7 +33,7 @@ public class AudioPacket {
         }
 
         if (useDirectBuffer) {
-            opus = ByteBuffer.allocateDirect(msg.length - offset)
+            opus = (ByteBuffer) ByteBuffer.allocateDirect(msg.length - offset)
                     .order(ByteOrder.nativeOrder())
                     .put(msg, offset, len - offset)
                     .flip();
