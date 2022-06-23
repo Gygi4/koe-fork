@@ -4,6 +4,8 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.socket.DatagramChannel;
 import moe.kyokobot.koe.MediaConnection;
 import moe.kyokobot.koe.codec.Codec;
@@ -25,6 +27,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSocketAddress> {
+    private static boolean WARNED = false;
     private static final Logger logger = LoggerFactory.getLogger(DiscordUDPConnection.class);
 
     private final MediaConnection connection;
@@ -38,6 +41,28 @@ public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSo
     private byte[] secretKey;
 
     private char seq;
+
+    public long getSocketFileDescriptor() {
+        if (channel instanceof EpollDatagramChannel) {
+            EpollDatagramChannel ch = (EpollDatagramChannel) channel;
+            return ch.fd().intValue();
+        }
+
+        if (!WARNED) {
+            WARNED = true;
+
+            boolean supportsEpoll = Epoll.isAvailable();
+
+            if (supportsEpoll) {
+                logger.warn("Could not get the UDP Socket file descriptor, audio receive system won't work. Enable Epoll, or disable NAS to be able to send and receive audio simultaneously.");
+            } else {
+                logger.warn("Could not get the UDP Socket file descriptor, audio receive system won't work. Disable NAS to be able to send and receive audio simultaneously.");
+            }
+        }
+
+        // SOCKET_INVALID (https://github.com/davidffa/jda-nas-fork/blob/master/udp-queue-natives/udpqueue/udpqueue.c#L26)
+        return -1;
+    }
 
     public DiscordUDPConnection(MediaConnection voiceConnection,
                                 SocketAddress serverAddress,
