@@ -1,6 +1,5 @@
 package moe.kyokobot.koe;
 
-import moe.kyokobot.koe.handler.AudioReceiveHandler;
 import moe.kyokobot.koe.media.MediaFrameProvider;
 import moe.kyokobot.koe.codec.Codec;
 import moe.kyokobot.koe.gateway.MediaGatewayConnection;
@@ -9,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 public interface MediaConnection extends Closeable {
@@ -40,9 +40,6 @@ public interface MediaConnection extends Closeable {
     @Nullable
     MediaFrameProvider getVideoSender();
 
-    @Nullable
-    AudioReceiveHandler getReceiveHandler();
-
     long getGuildId();
 
     @Nullable
@@ -56,8 +53,6 @@ public interface MediaConnection extends Closeable {
     void setAudioSender(@Nullable MediaFrameProvider sender);
 
     void setAudioCodec(@NotNull Codec audioCodec);
-
-    void setReceiveHandler(AudioReceiveHandler receiveHandler);
 
     /**
      * Starts polling audio frames. Called automatically after connecting, you don't have to.

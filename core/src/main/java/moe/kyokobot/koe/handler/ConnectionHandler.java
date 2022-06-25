@@ -1,7 +1,6 @@
 package moe.kyokobot.koe.handler;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.socket.DatagramChannel;
 import moe.kyokobot.koe.codec.Codec;
 import moe.kyokobot.koe.internal.json.JsonObject;
 
@@ -15,7 +14,6 @@ import java.util.concurrent.CompletionStage;
  * @param <R> type of the result returned if connection succeeds
  */
 public interface ConnectionHandler<R> {
-    long getSocketFileDescriptor();
     void close();
 
     void handleSessionDescription(JsonObject object);
@@ -27,8 +25,4 @@ public interface ConnectionHandler<R> {
     CompletionStage<R> connect();
 
     void sendFrame(byte payloadType, int timestamp, ByteBuf data, int start, boolean extension);
-
-    DatagramChannel getChannel();
-
-    byte[] getSecretKey();
 }

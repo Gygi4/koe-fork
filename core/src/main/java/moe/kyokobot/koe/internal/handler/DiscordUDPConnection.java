@@ -4,8 +4,6 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.epoll.Epoll;
-import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.socket.DatagramChannel;
 import moe.kyokobot.koe.MediaConnection;
 import moe.kyokobot.koe.codec.Codec;
@@ -27,7 +25,6 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSocketAddress> {
-    private static boolean WARNED = false;
     private static final Logger logger = LoggerFactory.getLogger(DiscordUDPConnection.class);
 
     private final MediaConnection connection;
@@ -41,28 +38,6 @@ public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSo
     private byte[] secretKey;
 
     private char seq;
-
-    public long getSocketFileDescriptor() {
-        if (channel instanceof EpollDatagramChannel) {
-            EpollDatagramChannel ch = (EpollDatagramChannel) channel;
-            return ch.fd().intValue();
-        }
-
-        if (!WARNED) {
-            WARNED = true;
-
-            boolean supportsEpoll = Epoll.isAvailable();
-
-            if (supportsEpoll) {
-                logger.warn("Could not get the UDP Socket file descriptor, audio receive system won't work. Enable Epoll, or disable NAS to be able to send and receive audio simultaneously.");
-            } else {
-                logger.warn("Could not get the UDP Socket file descriptor, audio receive system won't work. Disable NAS to be able to send and receive audio simultaneously.");
-            }
-        }
-
-        // SOCKET_INVALID (https://github.com/davidffa/jda-nas-fork/blob/master/udp-queue-natives/udpqueue/udpqueue.c#L26)
-        return -1;
-    }
 
     public DiscordUDPConnection(MediaConnection voiceConnection,
                                 SocketAddress serverAddress,
@@ -80,7 +55,7 @@ public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSo
     public CompletionStage<InetSocketAddress> connect() {
         logger.debug("Connecting to {}...", serverAddress);
 
-        CompletableFuture<InetSocketAddress> future = new CompletableFuture<>();
+        CompletableFuture<InetSocketAddress> future = new CompletableFuture<InetSocketAddress>();
         bootstrap.handler(new Initializer(this, future))
                 .connect(serverAddress)
                 .addListener(res -> {
@@ -179,30 +154,21 @@ public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSo
         return serverAddress;
     }
 
-    public DatagramChannel getChannel() {
-        return channel;
-    }
-
     private static class Initializer extends ChannelInitializer<DatagramChannel> {
-        private final DiscordUDPConnection udpConnection;
+        private final DiscordUDPConnection connection;
         private final CompletableFuture<InetSocketAddress> future;
 
-        private Initializer(DiscordUDPConnection udpConnection, CompletableFuture<InetSocketAddress> future) {
-            this.udpConnection = udpConnection;
+        private Initializer(DiscordUDPConnection connection, CompletableFuture<InetSocketAddress> future) {
+            this.connection = connection;
             this.future = future;
         }
 
         @Override
         protected void initChannel(DatagramChannel datagramChannel) {
-            udpConnection.channel = datagramChannel;
+            connection.channel = datagramChannel;
 
-            HolepunchHandler handler = new HolepunchHandler(future, udpConnection.ssrc);
+            HolepunchHandler handler = new HolepunchHandler(future, connection.ssrc);
             datagramChannel.pipeline().addFirst("handler", handler);
-
-            if (udpConnection.connection.getReceiveHandler() != null) {
-                logger.debug("Registering AudioReceiver listener");
-                datagramChannel.pipeline().addLast(new AudioReceiverHandler(udpConnection, udpConnection.connection));
-            }
         }
     }
 }
