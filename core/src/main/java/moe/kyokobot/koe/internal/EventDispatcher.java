@@ -19,7 +19,7 @@ public class EventDispatcher implements KoeEventListener {
         if (Objects.requireNonNull(listener) == this) {
             throw new IllegalArgumentException("Are you trying to register the dispatcher, rly?");
         }
-        
+
         listeners.add(listener);
     }
 
@@ -59,6 +59,27 @@ public class EventDispatcher implements KoeEventListener {
     public void userDisconnected(String id) {
         for (KoeEventListener listener : listeners) {
             listener.userDisconnected(id);
+        }
+    }
+
+    @Override
+    public void userSpeaking(String id, int ssrc, int speakingMask) {
+        for (KoeEventListener listener : listeners) {
+            listener.userSpeaking(id, ssrc, speakingMask);
+        }
+    }
+
+    @Override
+    public void userSpeakingStart(String id) {
+        for (KoeEventListener listener : listeners) {
+            listener.userSpeakingStart(id);
+        }
+    }
+
+    @Override
+    public void userSpeakingStop(String id) {
+        for (KoeEventListener listener : listeners) {
+            listener.userSpeakingStop(id);
         }
     }
 

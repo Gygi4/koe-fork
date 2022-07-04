@@ -34,8 +34,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.NotYetConnectedException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractMediaGatewayConnection implements MediaGatewayConnection {
     private static final Logger logger = LoggerFactory.getLogger(AbstractMediaGatewayConnection.class);
@@ -48,6 +50,8 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
     protected CompletableFuture<Void> connectFuture;
 
     protected EventExecutor eventExecutor;
+    // userId <-> ssrc
+    protected Map<Long, String> ssrcMap;
     protected Channel channel;
     protected int connectAttempt = 0;
     protected boolean resumable = false;
@@ -66,9 +70,15 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
                     .handler(new WebSocketInitializer());
             this.sslContext = SslContextBuilder.forClient().build();
             this.connectFuture = new CompletableFuture<>();
+            this.ssrcMap = new ConcurrentHashMap<>();
         } catch (SSLException | URISyntaxException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    public Map<Long, String> getSsrcMap() {
+        return ssrcMap;
     }
 
     @Override

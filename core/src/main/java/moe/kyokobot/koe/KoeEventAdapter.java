@@ -31,6 +31,21 @@ public class KoeEventAdapter implements KoeEventListener {
     }
 
     @Override
+    public void userSpeaking(String id, int ssrc, int speakingMask) {
+        //
+    }
+
+    @Override
+    public void userSpeakingStart(String id) {
+        //
+    }
+
+    @Override
+    public void userSpeakingStop(String id) {
+        //
+    }
+
+    @Override
     public void externalIPDiscovered(InetSocketAddress address) {
         //
     }
