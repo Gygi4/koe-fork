@@ -2,7 +2,6 @@ package moe.kyokobot.koe.internal;
 
 import moe.kyokobot.koe.*;
 import moe.kyokobot.koe.codec.Codec;
-import moe.kyokobot.koe.codec.CodecType;
 import moe.kyokobot.koe.codec.FramePoller;
 import moe.kyokobot.koe.codec.OpusCodec;
 import moe.kyokobot.koe.gateway.MediaGatewayConnection;
@@ -27,11 +26,8 @@ public class MediaConnectionImpl implements MediaConnection {
     private ConnectionHandler<?> connectionHandler;
     private VoiceServerInfo info;
     private Codec audioCodec;
-    private Codec videoCodec;
     private FramePoller audioPoller;
-    private FramePoller videoPoller;
     private MediaFrameProvider audioSender;
-    private MediaFrameProvider videoSender;
 
     public MediaConnectionImpl(@NotNull KoeClientImpl client, long guildId) {
         this.client = Objects.requireNonNull(client);
@@ -39,8 +35,6 @@ public class MediaConnectionImpl implements MediaConnection {
         this.dispatcher = new EventDispatcher();
         this.audioCodec = OpusCodec.INSTANCE;
         this.audioPoller = client.getOptions().getFramePollerFactory().createFramePoller(this.audioCodec, this);
-        this.videoCodec = null;
-        this.videoPoller = null;
     }
 
     @Override
@@ -58,7 +52,6 @@ public class MediaConnectionImpl implements MediaConnection {
     public void disconnect() {
         logger.debug("Disconnecting...");
         stopAudioFramePolling();
-        stopVideoFramePolling();
 
         if (gatewayConnection != null && gatewayConnection.isOpen()) {
             gatewayConnection.close(1000, null);
@@ -99,12 +92,6 @@ public class MediaConnectionImpl implements MediaConnection {
     }
 
     @Override
-    @Nullable
-    public MediaFrameProvider getVideoSender() {
-        return videoSender;
-    }
-
-    @Override
     public long getGuildId() {
         return guildId;
     }
@@ -136,10 +123,6 @@ public class MediaConnectionImpl implements MediaConnection {
 
     @Override
     public void setAudioCodec(@NotNull Codec audioCodec) {
-        if (Objects.requireNonNull(audioCodec).getType() != CodecType.AUDIO) {
-            throw new IllegalArgumentException("Specified codec must be an audio codec!");
-        }
-
         boolean wasPolling = this.audioPoller != null && this.audioPoller.isPolling();
         this.stopAudioFramePolling();
 
@@ -170,56 +153,6 @@ public class MediaConnectionImpl implements MediaConnection {
     }
 
     @Override
-    public void setVideoSender(@Nullable MediaFrameProvider sender) {
-        if (this.videoSender != null) {
-            this.videoSender.dispose();
-        }
-        this.videoSender = sender;
-    }
-
-    @Override
-    public void setVideoCodec(@Nullable Codec videoCodec) {
-        if (videoCodec == null) {
-            this.stopVideoFramePolling();
-            this.videoCodec = null;
-            this.videoPoller = null;
-            return;
-        }
-
-        if (videoCodec.getType() != CodecType.VIDEO) {
-            throw new IllegalArgumentException("Specified codec must be an video codec!");
-        }
-
-        boolean wasPolling = videoPoller != null && videoPoller.isPolling();
-        this.stopVideoFramePolling();
-
-        this.videoCodec = videoCodec;
-        this.videoPoller = client.getOptions().getFramePollerFactory().createFramePoller(videoCodec, this);
-
-        if (wasPolling) {
-            this.startVideoFramePolling();
-        }
-    }
-
-    @Override
-    public void startVideoFramePolling() {
-        if (this.videoPoller == null || this.videoPoller.isPolling()) {
-            return;
-        }
-
-        this.videoPoller.start();
-    }
-
-    @Override
-    public void stopVideoFramePolling() {
-        if (this.videoPoller == null || !this.videoPoller.isPolling()) {
-            return;
-        }
-
-        this.videoPoller.stop();
-    }
-
-    @Override
     public void registerListener(KoeEventListener listener) {
         dispatcher.register(listener);
     }
@@ -234,11 +167,6 @@ public class MediaConnectionImpl implements MediaConnection {
         if (this.audioSender != null) {
             this.audioSender.dispose();
             this.audioSender = null;
-        }
-
-        if (this.videoSender != null) {
-            this.videoSender.dispose();
-            this.videoSender = null;
         }
 
         disconnect();

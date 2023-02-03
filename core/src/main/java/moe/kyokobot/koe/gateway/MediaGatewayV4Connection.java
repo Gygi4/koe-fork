@@ -1,11 +1,9 @@
 package moe.kyokobot.koe.gateway;
 
 import moe.kyokobot.koe.VoiceServerInfo;
-import moe.kyokobot.koe.codec.OpusCodec;
 import moe.kyokobot.koe.crypto.EncryptionMode;
 import moe.kyokobot.koe.internal.MediaConnectionImpl;
 import moe.kyokobot.koe.internal.handler.DiscordUDPConnection;
-import moe.kyokobot.koe.internal.json.JsonArray;
 import moe.kyokobot.koe.internal.json.JsonObject;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -14,24 +12,16 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
     private static final Logger logger = LoggerFactory.getLogger(MediaGatewayV4Connection.class);
-    private static final JsonArray SUPPORTED_CODECS;
-
-    static {
-        SUPPORTED_CODECS = new JsonArray();
-        SUPPORTED_CODECS.add(OpusCodec.INSTANCE.getJsonDescription());
-    }
 
     private int ssrc;
     private SocketAddress address;
     private List<String> encryptionModes;
-    private UUID rtcConnectionId;
     private ScheduledFuture<?> heartbeatFuture;
 
     private long lastHeartbeatSent;
@@ -77,7 +67,7 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
                 resumable = true;
 
                 // Closing old UDP socket, since we're going to open a new one
-                // This condition will be true on reconnections without resume (eg. session invalid, etc)
+                // This condition will be true on reconnections without resume (e.g. session invalid, etc)
                 if (this.connection.getConnectionHandler() != null) {
                     this.connection.getConnectionHandler().close();
                 }
@@ -103,8 +93,7 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
                 logger.debug("Got session description: {}", data);
 
                 if (connection.getConnectionHandler() == null) {
-                    logger.warn("Received session description before protocol selection? (connection id = {})",
-                            this.rtcConnectionId);
+                    logger.warn("Received session description before protocol selection?");
                     break;
                 }
 
@@ -178,9 +167,6 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
         String mode = EncryptionMode.select(encryptionModes);
         logger.debug("Selected preferred encryption mode: {}", mode);
 
-        rtcConnectionId = UUID.randomUUID();
-        logger.debug("Generated new connection id: {}", rtcConnectionId);
-
         // known values: ["udp", "webrtc"]
         if (protocol.equals("udp")) {
             DiscordUDPConnection conn = new DiscordUDPConnection(connection, address, ssrc);
@@ -195,15 +181,8 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
 
                 sendInternalPayload(Op.SELECT_PROTOCOL, new JsonObject()
                         .add("protocol", "udp")
-                        .add("codecs", SUPPORTED_CODECS)
-                        .add("rtc_connection_id", rtcConnectionId.toString())
                         .add("data", udpInfo)
                         .combine(udpInfo));
-
-                sendInternalPayload(Op.CLIENT_CONNECT, new JsonObject()
-                        .add("audio_ssrc", ssrc)
-                        .add("video_ssrc", 0)
-                        .add("rtx_ssrc", 0));
             });
 
             connection.setConnectionHandler(conn);

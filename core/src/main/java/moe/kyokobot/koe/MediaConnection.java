@@ -37,9 +37,6 @@ public interface MediaConnection extends Closeable {
     @Nullable
     MediaFrameProvider getAudioSender();
 
-    @Nullable
-    MediaFrameProvider getVideoSender();
-
     long getGuildId();
 
     @Nullable
@@ -64,21 +61,6 @@ public interface MediaConnection extends Closeable {
      * @see MediaConnection#startAudioFramePolling()
      */
     void stopAudioFramePolling();
-
-    void setVideoSender(@Nullable MediaFrameProvider sender);
-
-    void setVideoCodec(@Nullable Codec videoCodec);
-
-    /**
-     * Starts polling video frames. Called automatically after connecting if codec has been set.
-     */
-    void startVideoFramePolling();
-
-    /**
-     * Stops polling video frames.
-     * @see MediaConnection#startAudioFramePolling()
-     */
-    void stopVideoFramePolling();
 
     void registerListener(KoeEventListener listener);
 
