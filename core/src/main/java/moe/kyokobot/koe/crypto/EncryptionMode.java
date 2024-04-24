@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public interface EncryptionMode {
+    int ZERO_BYTES_LENGTH = 32; // For XSalsa20Poly1305
+	
     boolean box(ByteBuf opus, int start, ByteBuf output, byte[] secretKey);
 
     String getName();
