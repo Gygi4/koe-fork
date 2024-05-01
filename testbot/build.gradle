@@ -1,0 +1,8 @@
+dependencies {
+    implementation project(':core')
+    implementation project(':ext-udpqueue')
+    implementation group: 'net.dv8tion', name: 'JDA', version: '5.0.0-beta.23'
+    implementation group: 'com.github.Gygi4', name: 'lavaplayer-fork', version: 'e4a73fc'
+    implementation group: 'com.github.lavalink-devs', name: 'lavaplayer-youtube-source', version: '1.0.6'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.4.12'
+}
