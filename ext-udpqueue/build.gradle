@@ -6,12 +6,21 @@ dependencies {
     compileOnly group: 'org.jetbrains', name: 'annotations', version: '13.0'
 }
 
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId rootProject.group
             artifactId moduleName
-            version rootProject.version
+
+            from components.java
+
+            artifact sourceJar {
+                archiveClassifier = 'sources'
+            }
         }
     }
 }
