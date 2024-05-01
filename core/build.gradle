@@ -1,8 +1,5 @@
-plugins {
-    id 'maven-publish'
-}
-
 ext.nettyVersion = '4.1.109.Final'
+ext.moduleName = 'core'
 
 dependencies {
     api group: 'io.netty', name: 'netty-transport', version: nettyVersion
@@ -11,4 +8,14 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-native-epoll', version: nettyVersion, classifier: 'linux-x86_64'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta4'
     compileOnly group: 'org.jetbrains', name: 'annotations', version: '13.0'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId rootProject.group
+            artifactId moduleName
+            version rootProject.version
+        }
+    }
 }
