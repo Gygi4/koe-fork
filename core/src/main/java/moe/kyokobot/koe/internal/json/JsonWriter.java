@@ -27,11 +27,11 @@ import java.util.Map;
 
 //@formatter:off
 /**
- * Factory for JSON writers that target {@link String}s and {@link Appendable}s. 
- * 
+ * Factory for JSON writers that target {@link String}s and {@link Appendable}s.
+ *
  * Creates writers that write JSON to a {@link String}, an {@link OutputStream}, or an
  * {@link Appendable} such as a {@link StringBuilder}, a {@link Writer} a {@link PrintStream} or a {@link CharBuffer}.
- * 
+ *
  * <pre>
  * String json = JsonWriter
  *     .indent("  ")
@@ -96,7 +96,7 @@ public final class JsonWriter {
 		//@formatter:off
 		/**
 		 * Creates a {@link JsonAppendableWriter} that can output to an {@link PrintStream} subclass.
-		 * 
+		 *
 		 * <pre>
 		 * JsonWriter.indent("  ").on(System.out)
 		 * 		.object()
@@ -116,7 +116,7 @@ public final class JsonWriter {
 		 * Creates a {@link JsonAppendableWriter} that can output to an {@link OutputStream} subclass. Uses the UTF-8
 		 * {@link Charset}. To specify a different charset, use the {@link JsonWriter#on(Appendable)} method with an
 		 * {@link OutputStreamWriter}.
-		 * 
+		 *
 		 * <pre>
 		 * JsonWriter.indent("  ").on(System.out)
 		 * 		.object()
@@ -137,7 +137,7 @@ public final class JsonWriter {
 	//@formatter:off
 	/**
 	 * Creates a {@link JsonWriter} source that will write indented output with the given indent.
-	 * 
+	 *
 	 * <pre>
 	 * String json = JsonWriter.indent("  ").string()
 	 *     .object()
@@ -157,7 +157,7 @@ public final class JsonWriter {
 			throw new IllegalArgumentException("indent must be non-null");
 		}
 
-		for (int i = 0; i < indent.length(); i++) {
+		for (var i = 0; i < indent.length(); i++) {
 			if (indent.charAt(i) != ' ' && indent.charAt(i) != '\t') {
 				throw new IllegalArgumentException("Only tabs and spaces are allowed for indent.");
 			}
@@ -169,7 +169,7 @@ public final class JsonWriter {
 	//@formatter:off
 	/**
 	 * Creates a new {@link JsonStringWriter}.
-	 * 
+	 *
      * <pre>
 	 * String json = JsonWriter.string()
 	 *     .object()
@@ -189,16 +189,16 @@ public final class JsonWriter {
 	}
 
 	/**
-	 * Emits a single value (a JSON primitive such as a {@link Number},
+	 * Emits a single value a JSON primitive such as a {@link Number},
 	 * {@link Boolean}, {@link String}, a {@link Map} or {@link JsonObject}, or
 	 * a {@link Collection} or {@link JsonArray}.
-	 * 
+	 *
 	 * Emit a {@link String}, JSON-escaped:
-	 * 
+	 *
 	 * <pre>
 	 * JsonWriter.string(&quot;abc\n\&quot;&quot;) // &quot;\&quot;abc\\n\\&quot;\&quot;&quot;
 	 * </pre>
-	 * 
+	 *
 	 * <pre>
 	 * JsonObject obj = new JsonObject();
 	 * obj.put("abc", 1);
@@ -221,7 +221,7 @@ public final class JsonWriter {
 	//@formatter:off
 	/**
 	 * Creates a {@link JsonAppendableWriter} that can output to an {@link PrintStream} subclass.
-	 * 
+	 *
 	 * <pre>
 	 * JsonWriter.on(System.out)
 	 * 		.object()
@@ -241,7 +241,7 @@ public final class JsonWriter {
 	 * Creates a {@link JsonAppendableWriter} that can output to an {@link OutputStream} subclass. Uses the UTF-8
 	 * {@link Charset}. To specify a different charset, use the {@link JsonWriter#on(Appendable)} method with an
 	 * {@link OutputStreamWriter}.
-	 * 
+	 *
 	 * <pre>
 	 * JsonWriter.on(System.out)
 	 * 		.object()
@@ -258,12 +258,12 @@ public final class JsonWriter {
 
 	/**
 	 * Escape a string value.
-	 * 
+	 *
 	 * @param value
 	 * @return the escaped JSON value
 	 */
 	public static String escape(String value) {
-		String s = string(value);
+        var s = string(value);
 		return s.substring(1, s.length() - 1);
 	}
 }

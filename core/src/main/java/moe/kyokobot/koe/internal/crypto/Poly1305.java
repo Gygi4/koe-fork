@@ -42,8 +42,8 @@ public class Poly1305 {
         this.fin = 0;
     }
 
-    public Poly1305 blocks(byte[] m, int mpos, int bytes) {
-        int highBit = this.fin != 0 ? 0 : (1 << 11);
+    public void blocks(byte[] m, int mpos, int bytes) {
+        var highBit = this.fin != 0 ? 0 : (1 << 11);
         int t0;
         int t1;
         int t2;
@@ -64,27 +64,27 @@ public class Poly1305 {
         int d8;
         int d9;
 
-        int h0 = this.h[0];
-        int h1 = this.h[1];
-        int h2 = this.h[2];
-        int h3 = this.h[3];
-        int h4 = this.h[4];
-        int h5 = this.h[5];
-        int h6 = this.h[6];
-        int h7 = this.h[7];
-        int h8 = this.h[8];
-        int h9 = this.h[9];
+        var h0 = this.h[0];
+        var h1 = this.h[1];
+        var h2 = this.h[2];
+        var h3 = this.h[3];
+        var h4 = this.h[4];
+        var h5 = this.h[5];
+        var h6 = this.h[6];
+        var h7 = this.h[7];
+        var h8 = this.h[8];
+        var h9 = this.h[9];
 
-        int r0 = this.r[0];
-        int r1 = this.r[1];
-        int r2 = this.r[2];
-        int r3 = this.r[3];
-        int r4 = this.r[4];
-        int r5 = this.r[5];
-        int r6 = this.r[6];
-        int r7 = this.r[7];
-        int r8 = this.r[8];
-        int r9 = this.r[9];
+        var r0 = this.r[0];
+        var r1 = this.r[1];
+        var r2 = this.r[2];
+        var r3 = this.r[3];
+        var r4 = this.r[4];
+        var r5 = this.r[5];
+        var r6 = this.r[6];
+        var r7 = this.r[7];
+        var r8 = this.r[8];
+        var r9 = this.r[9];
 
         while (bytes >= 16) {
             t0 = m[mpos] & 0xff | (m[mpos + 1] & 0xff) << 8;
@@ -299,7 +299,6 @@ public class Poly1305 {
         this.h[8] = h8;
         this.h[9] = h9;
 
-        return this;
     }
 
     public void finish(byte[] mac, int macPos) {
@@ -437,42 +436,42 @@ public class Poly1305 {
     }
 
     public void init(byte[] key) {
-        for (int i = 0; i < 8; i++) {
+        for (var i = 0; i < 8; i++) {
             this.pad[i] = 0;
             this.r[i] = 0;
             this.h[i] = 0;
             this.buffer[i] = 0;
         }
 
-        for (int i = 8; i < 10; i++) {
+        for (var i = 8; i < 10; i++) {
             this.r[i] = 0;
             this.h[i] = 0;
             this.buffer[i] = 0;
         }
 
-        for (int i = 10; i < 16; i++) {
+        for (var i = 10; i < 16; i++) {
             this.buffer[i] = 0;
         }
 
         this.leftover = 0;
         this.fin = 0;
 
-        int t0 = key[0] & 0xff | (key[1] & 0xff) << 8;
+        var t0 = key[0] & 0xff | (key[1] & 0xff) << 8;
         this.r[0] = t0 & 0x1fff;
-        int t1 = key[2] & 0xff | (key[3] & 0xff) << 8;
+        var t1 = key[2] & 0xff | (key[3] & 0xff) << 8;
         this.r[1] = ((t0 >>> 13) | (t1 << 3)) & 0x1fff;
-        int t2 = key[4] & 0xff | (key[5] & 0xff) << 8;
+        var t2 = key[4] & 0xff | (key[5] & 0xff) << 8;
         this.r[2] = ((t1 >>> 10) | (t2 << 6)) & 0x1f03;
-        int t3 = key[6] & 0xff | (key[7] & 0xff) << 8;
+        var t3 = key[6] & 0xff | (key[7] & 0xff) << 8;
         this.r[3] = ((t2 >>> 7) | (t3 << 9)) & 0x1fff;
-        int t4 = key[8] & 0xff | (key[9] & 0xff) << 8;
+        var t4 = key[8] & 0xff | (key[9] & 0xff) << 8;
         this.r[4] = ((t3 >>> 4) | (t4 << 12)) & 0x00ff;
         this.r[5] = (t4 >>> 1) & 0x1ffe;
-        int t5 = key[10] & 0xff | (key[11] & 0xff) << 8;
+        var t5 = key[10] & 0xff | (key[11] & 0xff) << 8;
         this.r[6] = ((t4 >>> 14) | (t5 << 2)) & 0x1fff;
-        int t6 = key[12] & 0xff | (key[13] & 0xff) << 8;
+        var t6 = key[12] & 0xff | (key[13] & 0xff) << 8;
         this.r[7] = ((t5 >>> 11) | (t6 << 5)) & 0x1f81;
-        int t7 = key[14] & 0xff | (key[15] & 0xff) << 8;
+        var t7 = key[14] & 0xff | (key[15] & 0xff) << 8;
         this.r[8] = ((t6 >>> 8) | (t7 << 8)) & 0x1fff;
         this.r[9] = (t7 >>> 5) & 0x007f;
 

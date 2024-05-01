@@ -52,12 +52,12 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
 
     @Override
     protected void handlePayload(JsonObject object) {
-        int op = object.getInt("op");
+        var op = object.getInt("op");
 
         switch (op) {
             case Op.HELLO: {
-                JsonObject data = object.getObject("d");
-                int interval = data.getInt("heartbeat_interval");
+                var data = object.getObject("d");
+                var interval = data.getInt("heartbeat_interval");
 
                 logger.debug("Received HELLO, heartbeat interval: {}", interval);
                 setupHeartbeats(interval);
@@ -67,14 +67,14 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
                 resumable = true;
 
                 // Closing old UDP socket, since we're going to open a new one
-                // This condition will be true on reconnections without resume (e.g. session invalid, etc)
+                // This condition will be true on reconnections without resume (e.g. session invalid, etc.)
                 if (this.connection.getConnectionHandler() != null) {
                     this.connection.getConnectionHandler().close();
                 }
 
-                JsonObject data = object.getObject("d");
-                int port = data.getInt("port");
-                String ip = data.getString("ip");
+                var data = object.getObject("d");
+                var port = data.getInt("port");
+                var ip = data.getString("ip");
                 ssrc = data.getInt("ssrc");
                 encryptionModes = data.getArray("modes")
                         .stream()
@@ -88,7 +88,7 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
                 break;
             }
             case Op.SESSION_DESCRIPTION: {
-                JsonObject data = object.getObject("d");
+                var data = object.getObject("d");
                 connectAttempt = 0;
                 logger.debug("Got session description: {}", data);
 
@@ -111,17 +111,17 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
                 break;
             }
             case Op.CLIENT_CONNECT: {
-                JsonObject data = object.getObject("d");
-                String user = data.getString("user_id");
-                int audioSsrc = data.getInt("audio_ssrc", 0);
-                int videoSsrc = data.getInt("video_ssrc", 0);
-                int rtxSsrc = data.getInt("rtx_ssrc", 0);
+                var data = object.getObject("d");
+                var user = data.getString("user_id");
+                var audioSsrc = data.getInt("audio_ssrc", 0);
+                var videoSsrc = data.getInt("video_ssrc", 0);
+                var rtxSsrc = data.getInt("rtx_ssrc", 0);
                 connection.getDispatcher().userConnected(user, audioSsrc, videoSsrc, rtxSsrc);
                 break;
             }
             case Op.CLIENT_DISCONNECT: {
-                JsonObject data = object.getObject("d");
-                String user = data.getString("user_id");
+                var data = object.getObject("d");
+                var user = data.getString("user_id");
                 connection.getDispatcher().userDisconnected(user);
                 break;
             }
@@ -164,17 +164,17 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
     }
 
     private void selectProtocol(String protocol) {
-        String mode = EncryptionMode.select(encryptionModes);
+        var mode = EncryptionMode.select(encryptionModes);
         logger.debug("Selected preferred encryption mode: {}", mode);
 
         // known values: ["udp", "webrtc"]
         if (protocol.equals("udp")) {
-            DiscordUDPConnection conn = new DiscordUDPConnection(connection, address, ssrc);
+            var conn = new DiscordUDPConnection(connection, address, ssrc);
             conn.connect().thenAccept(ourAddress -> {
                 logger.debug("Connected, our external address is: {}", ourAddress);
                 connection.getDispatcher().externalIPDiscovered(ourAddress);
 
-                JsonObject udpInfo = new JsonObject()
+                var udpInfo = new JsonObject()
                         .add("address", ourAddress.getAddress().getHostAddress())
                         .add("port", ourAddress.getPort())
                         .add("mode", mode);

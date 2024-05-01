@@ -22,11 +22,11 @@ public class QueueManagerPool {
 
         this.queueKeySeq = new AtomicLong();
         this.managers = new UdpQueueManager[size];
-        for (int i = 0; i < size; i++) {
-            UdpQueueManager queueManager = new UdpQueueManager(bufferDuration / FRAME_DURATION,
+        for (var i = 0; i < size; i++) {
+            var queueManager = new UdpQueueManager(bufferDuration / FRAME_DURATION,
                     TimeUnit.MILLISECONDS.toNanos(FRAME_DURATION), MAXIMUM_PACKET_SIZE);
             this.managers[i] = queueManager;
-            Thread thread = new Thread(queueManager::process, "QueueManagerPool-" + i);
+            var thread = new Thread(queueManager::process, "QueueManagerPool-" + i);
             thread.setPriority((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY) / 2);
             thread.setDaemon(true);
             thread.start();
@@ -39,7 +39,7 @@ public class QueueManagerPool {
         }
 
         this.closed = true;
-        for (UdpQueueManager manager : this.managers) {
+        for (var manager : this.managers) {
             if (manager != null) {
                 manager.close();
             }
@@ -47,12 +47,12 @@ public class QueueManagerPool {
     }
 
     public UdpQueueWrapper getNextWrapper() {
-        long queueKey = this.queueKeySeq.getAndIncrement();
+        var queueKey = this.queueKeySeq.getAndIncrement();
         return getWrapperForKey(queueKey);
     }
 
     public UdpQueueWrapper getWrapperForKey(long queueKey) {
-        UdpQueueManager manager = this.managers[(int) (queueKey % (long) this.managers.length)];
+        var manager = this.managers[(int) (queueKey % (long) this.managers.length)];
         return new UdpQueueWrapper(manager, queueKey);
     }
 

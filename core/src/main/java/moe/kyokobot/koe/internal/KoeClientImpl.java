@@ -38,7 +38,7 @@ public class KoeClientImpl implements KoeClient {
 
     @Override
     public void destroyConnection(long guildId) {
-        MediaConnection connection = connections.remove(guildId);
+        var connection = connections.remove(guildId);
 
         if (connection != null) {
             connection.close();
@@ -58,7 +58,7 @@ public class KoeClientImpl implements KoeClient {
     @Override
     public void close() {
         if (!connections.isEmpty()) {
-            ArrayList<Long> guilds = new ArrayList<>(connections.keySet());
+            var guilds = new ArrayList<>(connections.keySet());
             guilds.forEach(this::destroyConnection);
         }
     }

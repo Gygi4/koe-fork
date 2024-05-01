@@ -40,7 +40,7 @@ public class MediaConnectionImpl implements MediaConnection {
     @Override
     public CompletionStage<Void> connect(VoiceServerInfo info) {
         this.disconnect();
-        MediaGatewayConnection conn = client.getGatewayVersion().createConnection(this, info);
+        var conn = client.getGatewayVersion().createConnection(this, info);
 
         return conn.start().thenAccept(nothing -> {
             MediaConnectionImpl.this.info = info;
@@ -123,7 +123,7 @@ public class MediaConnectionImpl implements MediaConnection {
 
     @Override
     public void setAudioCodec(@NotNull Codec audioCodec) {
-        boolean wasPolling = this.audioPoller != null && this.audioPoller.isPolling();
+        var wasPolling = this.audioPoller != null && this.audioPoller.isPolling();
         this.stopAudioFramePolling();
 
         this.audioCodec = audioCodec;

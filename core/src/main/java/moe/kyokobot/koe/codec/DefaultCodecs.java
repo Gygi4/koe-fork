@@ -12,7 +12,7 @@ public class DefaultCodecs {
     public static final Map<String, Codec> audioCodecs;
 
     static {
-        audioCodecs = new HashMap<String, Codec>() {{
+        audioCodecs = new HashMap<>() {{
             put("opus", OpusCodec.INSTANCE);
         }};
     }

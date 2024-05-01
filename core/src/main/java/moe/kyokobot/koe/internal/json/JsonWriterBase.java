@@ -26,7 +26,7 @@ import java.util.Map;
  * Internal class that handles emitting to an {@link Appendable}. Users only see
  * the public subclasses, {@link JsonStringWriter} and
  * {@link JsonAppendableWriter}.
- * 
+ *
  * @param <SELF>
  *            A subclass of {@link JsonWriterBase}.
  */
@@ -100,7 +100,7 @@ class JsonWriterBase<SELF extends JsonWriterBase<SELF>> implements
 		else
 			array(key);
 
-		for (Object o : c) {
+		for (var o : c) {
 			value(o);
 		}
 
@@ -119,13 +119,13 @@ class JsonWriterBase<SELF extends JsonWriterBase<SELF>> implements
 		else
 			object(key);
 
-		for (Map.Entry<?, ?> entry : map.entrySet()) {
-			Object o = entry.getValue();
+		for (var entry : map.entrySet()) {
+            var o = entry.getValue();
 			if (!(entry.getKey() instanceof String))
 				throw new JsonWriterException("Invalid key type for map: "
 						+ (entry.getKey() == null ? "null" : entry.getKey()
 								.getClass()));
-			String k = (String) entry.getKey();
+            var k = (String) entry.getKey();
 			value(k, o);
 		}
 
@@ -161,9 +161,9 @@ class JsonWriterBase<SELF extends JsonWriterBase<SELF>> implements
 		else if (o instanceof Map)
 			return object((Map<?, ?>) o);
 		else if (o.getClass().isArray()) {
-			int length = Array.getLength(o);
+            var length = Array.getLength(o);
 			array();
-			for (int i = 0; i < length; i++)
+			for (var i = 0; i < length; i++)
 				value(Array.get(o, i));
 			return end();
 		} else
@@ -186,9 +186,9 @@ class JsonWriterBase<SELF extends JsonWriterBase<SELF>> implements
 		else if (o instanceof Map)
 			return object(key, (Map<?, ?>) o);
 		else if (o.getClass().isArray()) {
-			int length = Array.getLength(o);
+            var length = Array.getLength(o);
 			array(key);
-			for (int i = 0; i < length; i++)
+			for (var i = 0; i < length; i++)
 				value(Array.get(o, i));
 			return end();
 		} else
@@ -374,7 +374,7 @@ class JsonWriterBase<SELF extends JsonWriterBase<SELF>> implements
 
 	/**
 	 * Ensures that the object is in the finished state.
-	 * 
+	 *
 	 * @throws JsonWriterException
 	 *             if the written JSON is not properly balanced, ie: all arrays
 	 *             and objects that were started have been properly ended.
@@ -391,7 +391,7 @@ class JsonWriterBase<SELF extends JsonWriterBase<SELF>> implements
 	}
 
 	private void appendIndent() {
-		for (int i = 0; i < indent; i++) {
+		for (var i = 0; i < indent; i++) {
 			raw(indentString);
 		}
 	}
@@ -402,10 +402,10 @@ class JsonWriterBase<SELF extends JsonWriterBase<SELF>> implements
 
 	private void raw(String s) {
 		if (utf8) {
-			int l = s.length();
+            var l = s.length();
 			if (bo + l > BUFFER_SIZE)
 				flush();
-			for (int i = 0; i < l; i++)
+			for (var i = 0; i < l; i++)
 				bb[bo++] = (byte) s.charAt(i);
 		} else {
 			buffer.append(s);
@@ -417,10 +417,10 @@ class JsonWriterBase<SELF extends JsonWriterBase<SELF>> implements
 
 	private void raw(char[] c) {
 		if (utf8) {
-			int l = c.length;
+            var l = c.length;
 			if (bo + l > BUFFER_SIZE)
 				flush();
-			for (int i = 0; i < l; i++)
+			for (var i = 0; i < l; i++)
 				bb[bo++] = (byte) c[i];
 		} else {
 			buffer.append(c);
@@ -500,7 +500,7 @@ class JsonWriterBase<SELF extends JsonWriterBase<SELF>> implements
 	private void emitStringValue(String s) {
 		raw('"');
 		char b = 0, c = 0;
-		for (int i = 0; i < s.length(); i++) {
+		for (var i = 0; i < s.length(); i++) {
 			b = c;
 			c = s.charAt(i);
 
@@ -562,14 +562,14 @@ class JsonWriterBase<SELF extends JsonWriterBase<SELF>> implements
 							// TODO: bad surrogates
 							i++;
 
-							int fc = Character.toCodePoint(c, s.charAt(i));
+                            var fc = Character.toCodePoint(c, s.charAt(i));
 							if (fc < 0x1fffff) {
 								bb[bo++] = (byte) (0xf0 | fc >> 18);
 								bb[bo++] = (byte) (0x80 | (fc >> 12) & 0x3f);
 								bb[bo++] = (byte) (0x80 | (fc >> 6) & 0x3f);
 								bb[bo++] = (byte) (0x80 | fc & 0x3f);
 							} else {
-								throw new JsonWriterException("Unable to encode character 0x" 
+								throw new JsonWriterException("Unable to encode character 0x"
 										+ Integer.toHexString(fc));
 							}
 						} else {

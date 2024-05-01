@@ -31,7 +31,7 @@ public abstract class Codec {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Codec that = (Codec) o;
+        var that = (Codec) o;
         return payloadType == that.payloadType;
     }
 
@@ -59,7 +59,7 @@ public abstract class Codec {
      */
     @Nullable
     public static Codec getByPayload(byte payloadType) {
-        for (Codec codec : DefaultCodecs.audioCodecs.values()) {
+        for (var codec : DefaultCodecs.audioCodecs.values()) {
             if (codec.getPayloadType() == payloadType) {
                 return codec;
             }

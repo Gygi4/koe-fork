@@ -84,7 +84,7 @@ public final class JsonParser {
          * Parses the current JSON type from a {@link URL}.
          */
         public T from(URL url) throws JsonParserException {
-            try (InputStream stm = url.openStream()) {
+            try (var stm = url.openStream()) {
                 return from(stm);
             } catch (IOException e) {
                 throw new JsonParserException(e, "IOException opening URL", 1, 1, 0);
@@ -144,7 +144,7 @@ public final class JsonParser {
      */
     <T> T parse(Class<T> clazz) throws JsonParserException {
         advanceToken();
-        Object parsed = currentValue();
+        var parsed = currentValue();
         if (advanceToken() != JsonTokener.TOKEN_EOF)
             throw tokener.createParseException(null, "Expected end of input, got " + token, true);
         if (clazz != Object.class && (parsed == null || !clazz.isAssignableFrom(parsed.getClass())))
@@ -172,7 +172,7 @@ public final class JsonParser {
         token = tokener.advanceToToken();
         switch (token) {
             case JsonTokener.TOKEN_ARRAY_START: // Inlined function to avoid additional stack
-                JsonArray list = new JsonArray();
+                var list = new JsonArray();
                 if (advanceToken() != JsonTokener.TOKEN_ARRAY_END)
                     while (true) {
                         list.add(currentValue());
@@ -187,12 +187,12 @@ public final class JsonParser {
                 value = list;
                 return token = JsonTokener.TOKEN_ARRAY_START;
             case JsonTokener.TOKEN_OBJECT_START: // Inlined function to avoid additional stack
-                JsonObject map = new JsonObject();
+                var map = new JsonObject();
                 if (advanceToken() != JsonTokener.TOKEN_OBJECT_END)
                     while (true) {
                         if (token != JsonTokener.TOKEN_STRING)
                             throw tokener.createParseException(null, "Expected STRING, got " + token, true);
-                        String key = (String) value;
+                        var key = (String) value;
                         if (advanceToken() != JsonTokener.TOKEN_COLON)
                             throw tokener.createParseException(null, "Expected COLON, got " + token, true);
                         advanceToken();
@@ -233,7 +233,7 @@ public final class JsonParser {
     }
 
     private Number parseNumber() throws JsonParserException {
-        String number = tokener.reusableBuffer.toString();
+        var number = tokener.reusableBuffer.toString();
 
         try {
             if (tokener.isDouble)
@@ -247,8 +247,8 @@ public final class JsonParser {
             }
 
             // HACK: Attempt to parse using the approximate best type for this
-            boolean firstMinus = number.charAt(0) == '-';
-            int length = firstMinus ? number.length() - 1 : number.length();
+            var firstMinus = number.charAt(0) == '-';
+            var length = firstMinus ? number.length() - 1 : number.length();
             // CHECKSTYLE_OFF: MagicNumber
             if (length < 10 || (length == 10 && number.charAt(firstMinus ? 1 : 0) < '2')) // 2 147 483 647
                 return Integer.parseInt(number);

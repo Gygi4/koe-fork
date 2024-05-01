@@ -1,6 +1,5 @@
 package moe.kyokobot.koe.internal.handler;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -34,21 +33,21 @@ public class HolepunchHandler extends SimpleChannelInboundHandler<DatagramPacket
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) {
-        ByteBuf buf = packet.content();
+        var buf = packet.content();
 
         if (!future.isDone()) {
             if (buf.readableBytes() != 74) return;
 
             buf.skipBytes(8);
 
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
             byte b;
             while ((b = buf.readByte()) != 0) {
                 stringBuilder.append((char) b);
             }
 
-            String ip = stringBuilder.toString();
-            int port = buf.getUnsignedShort(72);
+            var ip = stringBuilder.toString();
+            var port = buf.getUnsignedShort(72);
 
             ctx.pipeline().remove(this);
             future.complete(new InetSocketAddress(ip, port));
@@ -67,7 +66,7 @@ public class HolepunchHandler extends SimpleChannelInboundHandler<DatagramPacket
         logger.debug("Holepunch [attempt {}/10, local ip: {}]", tries, ctx.channel().localAddress());
 
         if (packet == null) {
-            ByteBuf buf = Unpooled.buffer(74);
+            var buf = Unpooled.buffer(74);
             buf.writeShort(1);
             buf.writeShort(0x46);
             buf.writeInt(ssrc);

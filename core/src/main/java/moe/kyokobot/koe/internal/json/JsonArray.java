@@ -56,9 +56,9 @@ public class JsonArray extends ArrayList<Object> {
 	 * Creates a {@link JsonBuilder} for a {@link JsonArray}.
 	 */
 	public static JsonBuilder<JsonArray> builder() {
-		return new JsonBuilder<JsonArray>(new JsonArray());
+		return new JsonBuilder<>(new JsonArray());
 	}
-	
+
 	/**
 	 * Returns the underlying object at the given index, or null if it does not exist.
 	 */
@@ -77,7 +77,7 @@ public class JsonArray extends ArrayList<Object> {
 	 * Returns the {@link JsonArray} at the given index, or the default if it does not exist or is the wrong type.
 	 */
 	public JsonArray getArray(int key, JsonArray default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof JsonArray)
 			return (JsonArray)get(key);
 		return default_;
@@ -94,7 +94,7 @@ public class JsonArray extends ArrayList<Object> {
 	 * Returns the {@link Boolean} at the given index, or the default if it does not exist or is the wrong type.
 	 */
 	public boolean getBoolean(int key, Boolean default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof Boolean)
 			return (Boolean)o;
 		return default_;
@@ -111,7 +111,7 @@ public class JsonArray extends ArrayList<Object> {
 	 * Returns the {@link Double} at the given index, or the default if it does not exist or is the wrong type.
 	 */
 	public double getDouble(int key, double default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof Number)
 			return ((Number)o).doubleValue();
 		return default_;
@@ -128,7 +128,7 @@ public class JsonArray extends ArrayList<Object> {
 	 * Returns the {@link Float} at the given index, or the default if it does not exist or is the wrong type.
 	 */
 	public float getFloat(int key, float default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof Number)
 			return ((Number)o).floatValue();
 		return default_;
@@ -145,7 +145,7 @@ public class JsonArray extends ArrayList<Object> {
 	 * Returns the {@link Integer} at the given index, or the default if it does not exist or is the wrong type.
 	 */
 	public int getInt(int key, int default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof Number)
 			return ((Number)o).intValue();
 		return default_;
@@ -162,7 +162,7 @@ public class JsonArray extends ArrayList<Object> {
 	 * Returns the {@link Number} at the given index, or the default if it does not exist or is the wrong type.
 	 */
 	public Number getNumber(int key, Number default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof Number)
 			return (Number)o;
 		return default_;
@@ -179,7 +179,7 @@ public class JsonArray extends ArrayList<Object> {
 	 * Returns the {@link JsonObject} at the given index, or the default if it does not exist or is the wrong type.
 	 */
 	public JsonObject getObject(int key, JsonObject default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof JsonObject)
 			return (JsonObject)get(key);
 		return default_;
@@ -196,7 +196,7 @@ public class JsonArray extends ArrayList<Object> {
 	 * Returns the {@link String} at the given index, or the default if it does not exist or is the wrong type.
 	 */
 	public String getString(int key, String default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof String)
 			return (String)get(key);
 		return default_;

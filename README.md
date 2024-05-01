@@ -34,7 +34,7 @@ dependencies {
 
 #### Non-goals / won't do
 
-- Encoding - Koe only implements voice server communication, not voice handling itself, so it only accepts Opus frames and you have set up an encoder yourself, use [lavaplayer](https://github.com/sedmelluq/lavaplayer), libav/ffmpeg or anything else.
+- Encoding - Koe only implements voice server communication, not voice handling itself, so it only accepts Opus frames, and you have set up an encoder yourself, use [lavaplayer](https://github.com/sedmelluq/lavaplayer), libav/ffmpeg or anything else.
 - Voice receiving support - [it's not supported by Discord anyway](https://github.com/discordapp/discord-api-docs/issues/808#issuecomment-458863743), although someone could implement it by registering hooks.
 
 #### Extensions
@@ -48,4 +48,4 @@ dependencies {
 Koe includes modified/stripped-down parts based on following open-source projects:
 
 - [tweetnacl-java](https://github.com/InstantWebP2P/tweetnacl-java) (Poly1305, SecretBox)
-- [nanojson](https://github.com/mmastrac/nanojson) (modified for bytebuf support, changed the API a bit and etc.)
+- [nanojson](https://github.com/mmastrac/nanojson) (modified for bytebuf support, changed the API a bit etc.)

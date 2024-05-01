@@ -8,7 +8,7 @@ import java.util.concurrent.CompletionStage;
 
 /**
  * This interface specifies Discord voice connection handler, allowing to implement other methods of establishing voice
- * connections/transmitting audio packets eg. TCP or browser/WebRTC way via ICE instead of their minimalistic custom
+ * connections/transmitting audio packets e.g. TCP or browser/WebRTC way via ICE instead of their minimalistic custom
  * discovery protocol.
  *
  * @param <R> type of the result returned if connection succeeds

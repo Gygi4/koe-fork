@@ -55,7 +55,7 @@ public class JsonObject extends HashMap<String, Object> {
 	 * Creates a {@link JsonBuilder} for a {@link JsonObject}.
 	 */
 	public static JsonBuilder<JsonObject> builder() {
-		return new JsonBuilder<JsonObject>(new JsonObject());
+		return new JsonBuilder<>(new JsonObject());
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class JsonObject extends HashMap<String, Object> {
 	 * Returns the {@link JsonArray} at the given key, or the default if it does not exist or is the wrong type.
 	 */
 	public JsonArray getArray(String key, JsonArray default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof JsonArray)
 			return (JsonArray)get(key);
 		return default_;
@@ -86,7 +86,7 @@ public class JsonObject extends HashMap<String, Object> {
 	 * Returns the {@link Boolean} at the given key, or the default if it does not exist or is the wrong type.
 	 */
 	public boolean getBoolean(String key, Boolean default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof Boolean)
 			return (Boolean)o;
 		return default_;
@@ -103,7 +103,7 @@ public class JsonObject extends HashMap<String, Object> {
 	 * Returns the {@link Double} at the given key, or the default if it does not exist or is the wrong type.
 	 */
 	public double getDouble(String key, double default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof Number)
 			return ((Number)o).doubleValue();
 		return default_;
@@ -120,7 +120,7 @@ public class JsonObject extends HashMap<String, Object> {
 	 * Returns the {@link Float} at the given key, or the default if it does not exist or is the wrong type.
 	 */
 	public float getFloat(String key, float default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof Number)
 			return ((Number)o).floatValue();
 		return default_;
@@ -137,7 +137,7 @@ public class JsonObject extends HashMap<String, Object> {
 	 * Returns the {@link Integer} at the given key, or the default if it does not exist or is the wrong type.
 	 */
 	public int getInt(String key, int default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof Number)
 			return ((Number)o).intValue();
 		return default_;
@@ -154,7 +154,7 @@ public class JsonObject extends HashMap<String, Object> {
 	 * Returns the {@link Number} at the given key, or the default if it does not exist or is the wrong type.
 	 */
 	public Number getNumber(String key, Number default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof Number)
 			return (Number)o;
 		return default_;
@@ -171,7 +171,7 @@ public class JsonObject extends HashMap<String, Object> {
 	 * Returns the {@link JsonObject} at the given key, or the default if it does not exist or is the wrong type.
 	 */
 	public JsonObject getObject(String key, JsonObject default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof JsonObject)
 			return (JsonObject)get(key);
 		return default_;
@@ -188,7 +188,7 @@ public class JsonObject extends HashMap<String, Object> {
 	 * Returns the {@link String} at the given key, or the default if it does not exist or is the wrong type.
 	 */
 	public String getString(String key, String default_) {
-		Object o = get(key);
+        var o = get(key);
 		if (o instanceof String)
 			return (String)get(key);
 		return default_;

@@ -19,7 +19,7 @@ public class EventDispatcher implements KoeEventListener {
         if (Objects.requireNonNull(listener) == this) {
             throw new IllegalArgumentException("Are you trying to register the dispatcher, rly?");
         }
-        
+
         listeners.add(listener);
     }
 
@@ -29,49 +29,49 @@ public class EventDispatcher implements KoeEventListener {
 
     @Override
     public void gatewayError(Throwable cause) {
-        for (KoeEventListener listener : listeners) {
+        for (var listener : listeners) {
             listener.gatewayError(cause);
         }
     }
 
     @Override
     public void gatewayReady(InetSocketAddress target, int ssrc) {
-        for (KoeEventListener listener : listeners) {
+        for (var listener : listeners) {
             listener.gatewayReady(target, ssrc);
         }
     }
 
     @Override
     public void gatewayClosed(int code, String reason, boolean byRemote) {
-        for (KoeEventListener listener : listeners) {
+        for (var listener : listeners) {
             listener.gatewayClosed(code, reason, byRemote);
         }
     }
 
     @Override
     public void userConnected(String id, int audioSSRC, int videoSSRC, int rtxSSRC) {
-        for (KoeEventListener listener : listeners) {
+        for (var listener : listeners) {
             listener.userConnected(id, audioSSRC, videoSSRC, rtxSSRC);
         }
     }
 
     @Override
     public void userDisconnected(String id) {
-        for (KoeEventListener listener : listeners) {
+        for (var listener : listeners) {
             listener.userDisconnected(id);
         }
     }
 
     @Override
     public void externalIPDiscovered(InetSocketAddress address) {
-        for (KoeEventListener listener : listeners) {
+        for (var listener : listeners) {
             listener.externalIPDiscovered(address);
         }
     }
 
     @Override
     public void sessionDescription(JsonObject session) {
-        for (KoeEventListener listener : listeners) {
+        for (var listener : listeners) {
             listener.sessionDescription(session);
         }
     }

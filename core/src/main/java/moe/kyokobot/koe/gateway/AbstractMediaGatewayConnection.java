@@ -2,10 +2,8 @@ package moe.kyokobot.koe.gateway;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.EmptyHttpHeaders;
@@ -28,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -75,10 +72,10 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
     public CompletableFuture<Void> start() {
         if (connectFuture.isDone()) return connectFuture;
 
-        CompletableFuture<Void> future = new CompletableFuture<>();
+        var future = new CompletableFuture<Void>();
         logger.debug("Connecting to {}, attempt {}/3", websocketURI, connectAttempt);
 
-        ChannelFuture chFuture = bootstrap.connect(websocketURI.getHost(), websocketURI.getPort() == -1 ? 443 : websocketURI.getPort());
+        var chFuture = bootstrap.connect(websocketURI.getHost(), websocketURI.getPort() == -1 ? 443 : websocketURI.getPort());
         chFuture.addListener(new NettyFutureWrapper<>(future));
         future.thenAccept(v -> this.channel = chFuture.channel());
         return connectFuture;
@@ -156,7 +153,7 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
 
     protected void sendRaw(JsonObject object) {
         if (channel != null && channel.isOpen()) {
-            String data = object.toString();
+            var data = object.toString();
             logger.trace("<- {}", data);
             channel.writeAndFlush(new TextWebSocketFrame(data));
         }
@@ -183,7 +180,7 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
 
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-            Channel ch = ctx.channel();
+            var ch = ctx.channel();
 
             if (!handshaker.isHandshakeComplete()) {
                 if (msg instanceof FullHttpResponse) {
@@ -207,20 +204,20 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
             }
 
             if (msg instanceof FullHttpResponse) {
-                FullHttpResponse response = (FullHttpResponse) msg;
+                var response = (FullHttpResponse) msg;
                 throw new IllegalStateException(
                         "Unexpected FullHttpResponse (getStatus=" + response.status() +
                                 ", content=" + response.content().toString(StandardCharsets.UTF_8) + ")");
             }
 
             if (msg instanceof TextWebSocketFrame) {
-                TextWebSocketFrame frame = (TextWebSocketFrame) msg;
-                JsonObject object = JsonParser.object().from(frame.content());
+                var frame = (TextWebSocketFrame) msg;
+                var object = JsonParser.object().from(frame.content());
                 logger.trace("-> {}", object);
                 frame.release();
                 handlePayload(object);
             } else if (msg instanceof CloseWebSocketFrame) {
-                CloseWebSocketFrame frame = (CloseWebSocketFrame) msg;
+                var frame = (CloseWebSocketFrame) msg;
                 if (logger.isDebugEnabled()) {
                     logger.debug("Websocket closed, code: {}, reason: {}", frame.statusCode(), frame.reasonText());
                 }
@@ -245,8 +242,8 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
     private class WebSocketInitializer extends ChannelInitializer<SocketChannel> {
         @Override
         protected void initChannel(SocketChannel ch) {
-            ChannelPipeline pipeline = ch.pipeline();
-            SSLEngine engine = sslContext.newEngine(ch.alloc());
+            var pipeline = ch.pipeline();
+            var engine = sslContext.newEngine(ch.alloc());
             pipeline.addLast("ssl", new SslHandler(engine));
             pipeline.addLast("http-codec", new HttpClientCodec());
             pipeline.addLast("aggregator", new HttpObjectAggregator(65536));

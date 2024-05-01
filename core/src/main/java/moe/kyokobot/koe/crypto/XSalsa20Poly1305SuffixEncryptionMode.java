@@ -14,19 +14,19 @@ public class XSalsa20Poly1305SuffixEncryptionMode implements EncryptionMode {
     @Override
     @SuppressWarnings("Duplicates")
     public boolean box(ByteBuf packet, int len, ByteBuf output, byte[] secretKey) {
-        for (int i = 0; i < c.length; i++) {
+        for (var i = 0; i < c.length; i++) {
             m[i] = 0;
             c[i] = 0;
         }
 
-        for (int i = 0; i < len; i++) {
+        for (var i = 0; i < len; i++) {
             m[i + 32] = packet.readByte();
         }
 
         ThreadLocalRandom.current().nextBytes(extendedNonce);
 
         if (0 == nacl.cryptoSecretboxXSalsa20Poly1305(c, m, len + 32, extendedNonce, secretKey)) {
-            for (int i = 0; i < (len + 16); i++) {
+            for (var i = 0; i < (len + 16); i++) {
                 output.writeByte(c[i + 16]);
             }
             output.writeBytes(extendedNonce);
