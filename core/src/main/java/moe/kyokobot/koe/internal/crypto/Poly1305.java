@@ -298,7 +298,6 @@ public class Poly1305 {
         this.h[7] = h7;
         this.h[8] = h8;
         this.h[9] = h9;
-
     }
 
     public void finish(byte[] mac, int macPos) {
