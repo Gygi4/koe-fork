@@ -1,4 +1,4 @@
-ext.nettyVersion = '4.1.111.Final'
+ext.nettyVersion = '4.1.112.Final'
 ext.moduleName = 'core'
 
 dependencies {
