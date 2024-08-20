@@ -55,7 +55,6 @@ public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSo
         logger.debug("Connecting to {}...", serverAddress);
 
         var future = new CompletableFuture<InetSocketAddress>();
-
         bootstrap.handler(new Initializer(this, future))
                 .connect(serverAddress)
                 .addListener(res -> {
@@ -63,7 +62,6 @@ public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSo
                         future.completeExceptionally(res.cause());
                     }
                 });
-
         return future;
     }
 
@@ -92,20 +90,19 @@ public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSo
         }
 
         var keyArray = object.getArray("secret_key");
-
         this.secretKey = new byte[keyArray.size()];
 
-        for (var i = 0; i < secretKey.length; i++) {
+        for (int i = 0; i < secretKey.length; i++) {
             this.secretKey[i] = (byte) (keyArray.getInt(i) & 0xff);
         }
 
         connection.startAudioFramePolling();
+        connection.startVideoFramePolling();
     }
 
     @Override
     public void sendFrame(byte payloadType, int timestamp, ByteBuf data, int len, boolean extension) {
         var buf = createPacket(payloadType, timestamp, data, len, extension);
-
         if (buf != null) {
             channel.writeAndFlush(buf);
         }
@@ -117,7 +114,6 @@ public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSo
         }
 
         var buf = allocator.buffer();
-
         buf.clear();
         RTPHeaderWriter.writeV2(buf, payloadType, nextSeq(), timestamp, ssrc, extension);
         if (encryptionMode.box(data, len, buf, secretKey)) {
@@ -172,7 +168,6 @@ public class DiscordUDPConnection implements Closeable, ConnectionHandler<InetSo
 
             var handler = new HolepunchHandler(future, connection.ssrc);
             var pipeline = datagramChannel.pipeline();
-
             pipeline.addFirst("handler", handler);
             pipeline.addLast("rtcp", new RTCPHandler());
         }

@@ -14,13 +14,13 @@ public class NettyFramePollerFactory implements FramePollerFactory {
     public NettyFramePollerFactory() {
         codecMap = new HashMap<>();
         codecMap.put(OpusCodec.INSTANCE, NettyOpusFramePoller::new);
+        codecMap.put(H264Codec.INSTANCE, NettyH264FramePoller::new);
     }
 
     @Override
     @Nullable
     public FramePoller createFramePoller(Codec codec, MediaConnection connection) {
         var constructor = codecMap.get(codec);
-
         if (constructor != null) {
             return constructor.apply(connection);
         }

@@ -10,27 +10,27 @@ public class GCPressureGenerator {
                 try {
                     {
                         var l = new ArrayList<int[]>();
-                        for (var i = 0; i < 10000; i++) {
+                        for (int i = 0; i < 10000; i++) {
                             l.add(new int[1024]);
                         }
                         l.stream().map(String::valueOf).count();
                     }
                     {
-                        for (var i = 0; i < 25000; i++) {
+                        for (int i = 0; i < 25000; i++) {
                             var arr = "malksmdlkamsldmalksmdlkmasldmlkam32908092930180928308290488209830928081028013sldmlkamslkdmlakmsldkmlakmsldkmalsmdalksmldaads".split(String.valueOf(i));
                         }
                     }
                     {
-                        for (var i = 0; i < 25000; i++) {
+                        for (int i = 0; i < 25000; i++) {
                             new TestBot(null);
                         }
                     }
 
-                    var pre = System.currentTimeMillis();
+                    long pre = System.currentTimeMillis();
                     System.gc();
                     System.out.printf("GC took %dms\n", System.currentTimeMillis() - pre);
                 } catch (OutOfMemoryError e) {
-                    var pre = System.currentTimeMillis();
+                    long pre = System.currentTimeMillis();
                     System.gc();
                     System.out.printf("OOM! GC took %dms\n", System.currentTimeMillis() - pre);
                 }

@@ -59,7 +59,7 @@ public abstract class OpusAudioFrameProvider implements MediaFrameProvider {
             return true;
         }
 
-        var provide = canProvide();
+        boolean provide = canProvide();
 
         if (lastProvide != provide) {
             lastProvide = provide;
@@ -90,9 +90,9 @@ public abstract class OpusAudioFrameProvider implements MediaFrameProvider {
             return false;
         }
 
-        var startIndex = buf.writerIndex();
+        int startIndex = buf.writerIndex();
         retrieveOpusFrame(buf);
-        var written = buf.writerIndex() != startIndex;
+        boolean written = buf.writerIndex() != startIndex;
 
         if (written && !speaking) {
             setSpeaking(true);
@@ -102,8 +102,8 @@ public abstract class OpusAudioFrameProvider implements MediaFrameProvider {
             counter = SILENCE_FRAME_COUNT;
         }
 
-        var now = System.currentTimeMillis();
-        var changeTalking = (now - lastFramePolled) > OpusCodec.FRAME_DURATION;
+        long now = System.currentTimeMillis();
+        boolean changeTalking = (now - lastFramePolled) > OpusCodec.FRAME_DURATION;
         lastFramePolled = now;
         if (changeTalking) {
             setSpeaking(written);

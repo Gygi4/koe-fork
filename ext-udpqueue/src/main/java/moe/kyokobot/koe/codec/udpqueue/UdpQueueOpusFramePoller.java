@@ -42,18 +42,18 @@ public class UdpQueueOpusFramePoller extends AbstractFramePoller {
             return;
         }
 
-        var remaining = manager.getRemainingCapacity();
+        int remaining = manager.getRemainingCapacity();
 
         var handler = (DiscordUDPConnection) connection.getConnectionHandler();
         var sender = connection.getAudioSender();
         var codec = OpusCodec.INSTANCE;
 
-        for (var i = 0; i < remaining; i++) {
+        for (int i = 0; i < remaining; i++) {
             if (sender != null && handler != null && sender.canSendFrame(codec)) {
                 var buf = allocator.buffer();
-                var start = buf.writerIndex();
+                int start = buf.writerIndex();
                 sender.retrieve(codec, buf, timestamp);
-                var len = buf.writerIndex() - start;
+                int len = buf.writerIndex() - start;
                 var packet = handler.createPacket(OpusCodec.PAYLOAD_TYPE, timestamp.get(), buf, len, false);
                 if (packet != null) {
                     manager.queuePacket(packet.nioBuffer(), (InetSocketAddress) handler.getServerAddress());
@@ -63,7 +63,7 @@ public class UdpQueueOpusFramePoller extends AbstractFramePoller {
             }
         }
 
-        var frameDelay = 40 - (System.currentTimeMillis() - lastFrame);
+        long frameDelay = 40 - (System.currentTimeMillis() - lastFrame);
 
         if (frameDelay > 0) {
             eventLoop.schedule(this::loop, frameDelay, TimeUnit.MILLISECONDS);

@@ -21,7 +21,7 @@ import java.util.Map;
 
 /**
  * Builds a {@link JsonObject} or {@link JsonArray}.
- *
+ * 
  * @param <T>
  *            The type of JSON object to build.
  */
@@ -40,7 +40,7 @@ public final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
 	public T done() {
 		return root;
 	}
-
+	
 	@Override
 	public JsonBuilder<T> array(Collection<?> c) {
 		return value(c);
@@ -155,7 +155,7 @@ public final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
 
 	@Override
 	public JsonBuilder<T> array() {
-        var a = new JsonArray();
+		JsonArray a = new JsonArray();
 		value(a);
 		json.push(a);
 		return this;
@@ -163,7 +163,7 @@ public final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
 
 	@Override
 	public JsonBuilder<T> object() {
-        var o = new JsonObject();
+		JsonObject o = new JsonObject();
 		value(o);
 		json.push(o);
 		return this;
@@ -171,7 +171,7 @@ public final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
 
 	@Override
 	public JsonBuilder<T> array(String key) {
-        var a = new JsonArray();
+		JsonArray a = new JsonArray();
 		value(key, a);
 		json.push(a);
 		return this;
@@ -179,7 +179,7 @@ public final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
 
 	@Override
 	public JsonBuilder<T> object(String key) {
-        var o = new JsonObject();
+		JsonObject o = new JsonObject();
 		value(key, o);
 		json.push(o);
 		return this;
@@ -200,7 +200,7 @@ public final class JsonBuilder<T> implements JsonSink<JsonBuilder<T>> {
 			throw new JsonWriterException("Attempted to write a keyed value to a JsonArray");
 		}
 	}
-
+	
 	private JsonArray arr() {
 		try {
 			return (JsonArray)json.peek();

@@ -26,7 +26,7 @@ public class KoeOptionsBuilder {
     private boolean highPacketPriority;
 
     KoeOptionsBuilder() {
-        var epoll = Epoll.isAvailable();
+        boolean epoll = Epoll.isAvailable();
         this.eventLoopGroup = epoll
                 ? new EpollEventLoopGroup()
                 : new NioEventLoopGroup();
@@ -39,7 +39,7 @@ public class KoeOptionsBuilder {
                 : NioDatagramChannel.class;
 
         this.byteBufAllocator = new PooledByteBufAllocator();
-        this.gatewayVersion = GatewayVersion.V4;
+        this.gatewayVersion = GatewayVersion.V8;
         this.framePollerFactory = new NettyFramePollerFactory();
         this.highPacketPriority = true;
     }

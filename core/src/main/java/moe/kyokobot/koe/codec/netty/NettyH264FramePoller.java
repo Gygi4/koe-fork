@@ -2,17 +2,21 @@ package moe.kyokobot.koe.codec.netty;
 
 import moe.kyokobot.koe.MediaConnection;
 import moe.kyokobot.koe.codec.AbstractFramePoller;
-import moe.kyokobot.koe.codec.OpusCodec;
+import moe.kyokobot.koe.codec.H264Codec;
 import moe.kyokobot.koe.media.IntReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
-public class NettyOpusFramePoller extends AbstractFramePoller {
-    private static final Logger logger = LoggerFactory.getLogger(NettyOpusFramePoller.class);
+public class NettyH264FramePoller extends AbstractFramePoller {
+    private static final Logger logger = LoggerFactory.getLogger(NettyH264FramePoller.class);
+    /**
+     * Delay between frame polling attempts.
+     */
+    private static final int FRAME_RATE = 1000 / 30;
 
-    public NettyOpusFramePoller(MediaConnection connection) {
+    public NettyH264FramePoller(MediaConnection connection) {
         super(connection);
     }
 
@@ -20,6 +24,7 @@ public class NettyOpusFramePoller extends AbstractFramePoller {
      * Last frame time in ms.
      */
     private long lastFrame = 0;
+
 
     /**
      * Current frame timestamp.
@@ -47,28 +52,29 @@ public class NettyOpusFramePoller extends AbstractFramePoller {
             return;
         }
 
+        boolean pollNext = false;
         try {
-            var handler = connection.getConnectionHandler();
-            var sender = connection.getAudioSender();
-            var codec = OpusCodec.INSTANCE;
+            do {
+                var handler = connection.getConnectionHandler();
+                var sender = connection.getAudioSender();
+                var codec = H264Codec.INSTANCE;
 
-            // ugly but it's the hottest path in Koe and Java is a shit language.
-            if (sender != null && handler != null && sender.canSendFrame(codec)) {
-                var buf = allocator.buffer();
-                int start = buf.writerIndex();
-                // opus codec doesn't need framing, we don't handle multiple packet cases.
-                sender.retrieve(codec, buf, timestamp);
-                int len = buf.writerIndex() - start;
-                if (len != 0) {
-                    handler.sendFrame(OpusCodec.PAYLOAD_TYPE, timestamp.get(), buf, len, false);
+                if (sender != null && handler != null && sender.canSendFrame(codec)) {
+                    var buf = allocator.buffer();
+                    int start = buf.writerIndex();
+                    pollNext = sender.retrieve(codec, buf, timestamp);
+                    int len = buf.writerIndex() - start;
+                    if (len != 0) {
+                        handler.sendFrame(H264Codec.PAYLOAD_TYPE, timestamp.get(), buf, len, true);
+                    }
+                    buf.release();
                 }
-                buf.release();
-            }
-        } catch (Exception e) { // get rid of somehow?
+            } while (pollNext);
+        } catch (Exception e) {
             logger.error("Sending frame failed", e);
         }
 
-        long frameDelay = 20 - (System.currentTimeMillis() - lastFrame);
+        long frameDelay = FRAME_RATE - (System.currentTimeMillis() - lastFrame);
 
         if (frameDelay > 0) {
             eventLoop.schedule(this::loop, frameDelay, TimeUnit.MILLISECONDS);
@@ -79,7 +85,7 @@ public class NettyOpusFramePoller extends AbstractFramePoller {
 
     private void loop() {
         if (System.currentTimeMillis() < lastFrame + 60) {
-            lastFrame += 20;
+            lastFrame += FRAME_RATE;
         } else {
             lastFrame = System.currentTimeMillis();
         }

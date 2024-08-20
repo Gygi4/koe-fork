@@ -1,26 +1,5 @@
-ext.moduleName = 'ext-udpqueue'
-
 dependencies {
     compileOnly project(':core')
     implementation 'com.github.davidffa.jda-nas-fork:udp-queue:1.0.3'
-    compileOnly group: 'org.jetbrains', name: 'annotations', version: '13.0'
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId rootProject.group
-            artifactId moduleName
-
-            from components.java
-
-            artifact sourceJar {
-                archiveClassifier = 'sources'
-            }
-        }
-    }
+    compileOnly group: 'org.jetbrains', name: 'annotations', version: '24.1.0'
 }

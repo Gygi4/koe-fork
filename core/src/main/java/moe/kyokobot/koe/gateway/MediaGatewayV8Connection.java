@@ -19,8 +19,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
-    private static final Logger logger = LoggerFactory.getLogger(MediaGatewayV4Connection.class);
+public class MediaGatewayV8Connection extends AbstractMediaGatewayConnection {
+    private static final Logger logger = LoggerFactory.getLogger(MediaGatewayV8Connection.class);
     private static final JsonArray SUPPORTED_CODECS;
 
     static {
@@ -33,12 +33,13 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
     private List<String> encryptionModes;
     private UUID rtcConnectionId;
     private ScheduledFuture<?> heartbeatFuture;
+    private int seq = -1;
 
     private long lastHeartbeatSent;
     private long ping;
 
-    public MediaGatewayV4Connection(MediaConnectionImpl connection, VoiceServerInfo voiceServerInfo) {
-        super(connection, voiceServerInfo, 4);
+    public MediaGatewayV8Connection(MediaConnectionImpl connection, VoiceServerInfo voiceServerInfo) {
+        super(connection, voiceServerInfo, 8);
     }
 
     @Override
@@ -57,12 +58,14 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
         sendInternalPayload(Op.RESUME, new JsonObject()
                 .addAsString("server_id", connection.getGuildId())
                 .add("session_id", voiceServerInfo.getSessionId())
-                .add("token", voiceServerInfo.getToken()));
+                .add("token", voiceServerInfo.getToken())
+                .add("seq_ack", seq));
     }
 
     @Override
     protected void handlePayload(JsonObject object) {
         var op = object.getInt("op");
+        this.seq = object.getInt("seq", seq);
 
         switch (op) {
             case Op.HELLO: {
@@ -166,7 +169,9 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
 
     private void heartbeat() {
         this.lastHeartbeatSent = System.currentTimeMillis();
-        sendInternalPayload(Op.HEARTBEAT, System.currentTimeMillis());
+        sendInternalPayload(Op.HEARTBEAT, new JsonObject()
+                .add("t", System.currentTimeMillis())
+                .add("seq_ack", seq));
     }
 
     private void selectProtocol(String protocol) {

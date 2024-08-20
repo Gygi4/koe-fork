@@ -1,7 +1,8 @@
 package moe.kyokobot.koe.gateway;
 
 import moe.kyokobot.koe.VoiceServerInfo;
-import moe.kyokobot.koe.codec.OpusCodec;
+import moe.kyokobot.koe.codec.Codec;
+import moe.kyokobot.koe.codec.DefaultCodecs;
 import moe.kyokobot.koe.crypto.EncryptionMode;
 import moe.kyokobot.koe.internal.MediaConnectionImpl;
 import moe.kyokobot.koe.internal.handler.DiscordUDPConnection;
@@ -18,15 +19,10 @@ import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
-    private static final Logger logger = LoggerFactory.getLogger(MediaGatewayV4Connection.class);
-    private static final JsonArray SUPPORTED_CODECS;
-
-    static {
-        SUPPORTED_CODECS = new JsonArray();
-        SUPPORTED_CODECS.add(OpusCodec.INSTANCE.getJsonDescription());
-    }
+public class MediaGatewayV5Connection extends AbstractMediaGatewayConnection {
+    private static final Logger logger = LoggerFactory.getLogger(MediaGatewayV5Connection.class);
 
     private int ssrc;
     private SocketAddress address;
@@ -37,8 +33,8 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
     private long lastHeartbeatSent;
     private long ping;
 
-    public MediaGatewayV4Connection(MediaConnectionImpl connection, VoiceServerInfo voiceServerInfo) {
-        super(connection, voiceServerInfo, 4);
+    public MediaGatewayV5Connection(MediaConnectionImpl connection, VoiceServerInfo voiceServerInfo) {
+        super(connection, voiceServerInfo, 5);
     }
 
     @Override
@@ -48,7 +44,8 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
                 .addAsString("server_id", connection.getGuildId())
                 .addAsString("user_id", connection.getClient().getClientId())
                 .add("session_id", voiceServerInfo.getSessionId())
-                .add("token", voiceServerInfo.getToken()));
+                .add("token", voiceServerInfo.getToken())
+                .add("video", true));
     }
 
     @Override
@@ -57,7 +54,8 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
         sendInternalPayload(Op.RESUME, new JsonObject()
                 .addAsString("server_id", connection.getGuildId())
                 .add("session_id", voiceServerInfo.getSessionId())
-                .add("token", voiceServerInfo.getToken()));
+                .add("token", voiceServerInfo.getToken())
+                .add("video", true));
     }
 
     @Override
@@ -87,7 +85,7 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
                 address = new InetSocketAddress(ip, port);
 
                 connection.getDispatcher().gatewayReady((InetSocketAddress) address, ssrc);
-                logger.debug("Got READY, ssrc: {}", ssrc);
+                logger.debug("Voice READY, ssrc: {}", ssrc);
                 selectProtocol("udp");
                 break;
             }
@@ -129,6 +127,17 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
                 var data = object.getObject("d");
                 var user = data.getString("user_id");
                 connection.getDispatcher().userDisconnected(user);
+                break;
+            }
+            case Op.VIDEO_SINK_WANTS: {
+                // Sent only if `video` flag was true while identifying. At time of writing this comment Discord forces
+                // it to false on bots (so. user bot time? /s) due to voice server bug that broke clients or something.
+                // After receiving this opcode client can send op 12 with ssrcs for video (audio + 1)
+                // and retransmission (audio + 2, not required but results in graphical issues if user joins a VC
+                // or even resizes the window) and start sending video data according to received quality hint -
+                // so if (d.any < 100) in this payload, the client should send video data with lowered resolution
+                // and bitrate.
+
                 break;
             }
             default:
@@ -188,12 +197,19 @@ public class MediaGatewayV4Connection extends AbstractMediaGatewayConnection {
                         .add("port", ourAddress.getPort())
                         .add("mode", mode);
 
+                var codecs = new JsonArray();
+                Stream.concat(DefaultCodecs.audioCodecs.values().stream(), DefaultCodecs.videoCodecs.values().stream())
+                        .map(Codec::getJsonDescription)
+                        .forEach(codecs::add);
+
                 sendInternalPayload(Op.SELECT_PROTOCOL, new JsonObject()
                         .add("protocol", "udp")
-                        .add("codecs", SUPPORTED_CODECS)
+                        .add("codecs", codecs)
                         .add("rtc_connection_id", rtcConnectionId.toString())
                         .add("data", udpInfo)
                         .combine(udpInfo));
+
+                this.updateSpeaking(0);
 
                 sendInternalPayload(Op.CLIENT_CONNECT, new JsonObject()
                         .add("audio_ssrc", ssrc)

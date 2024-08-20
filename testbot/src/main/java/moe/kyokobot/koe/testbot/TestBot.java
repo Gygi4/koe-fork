@@ -90,7 +90,7 @@ public class TestBot extends ListenerAdapter implements VoiceDispatchInterceptor
     public AudioPlayerManager createAudioPlayerManager() {
         var manager = new DefaultAudioPlayerManager();
         manager.registerSourceManager(new YoutubeAudioSourceManager());
-        manager.registerSourceManager(SoundCloudAudioSourceManager.createDefault(true));
+        manager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
         manager.registerSourceManager(new HttpAudioSourceManager());
         return manager;
     }

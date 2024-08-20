@@ -22,7 +22,7 @@ public class QueueManagerPool {
 
         this.queueKeySeq = new AtomicLong();
         this.managers = new UdpQueueManager[size];
-        for (var i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             var queueManager = new UdpQueueManager(bufferDuration / FRAME_DURATION,
                     TimeUnit.MILLISECONDS.toNanos(FRAME_DURATION), MAXIMUM_PACKET_SIZE);
             this.managers[i] = queueManager;
@@ -47,7 +47,7 @@ public class QueueManagerPool {
     }
 
     public UdpQueueWrapper getNextWrapper() {
-        var queueKey = this.queueKeySeq.getAndIncrement();
+        long queueKey = this.queueKeySeq.getAndIncrement();
         return getWrapperForKey(queueKey);
     }
 

@@ -1,7 +1,7 @@
 package moe.kyokobot.koe.testbot;
 
 /**
- * Starts a Koe test bot instance with default configurations, without any extensions and etc.
+ * Starts a Koe test bot instance with default configurations, without any extensions etc.
  */
 public class KoeTestBotLauncher {
     public static void main(String... args) {

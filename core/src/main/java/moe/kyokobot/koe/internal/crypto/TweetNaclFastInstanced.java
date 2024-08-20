@@ -27,42 +27,42 @@ package moe.kyokobot.koe.internal.crypto;
 @SuppressWarnings("Duplicates")
 public final class TweetNaclFastInstanced {
     private void coreSalsa20(byte[] o, byte[] p, byte[] k) {
-        var j0 = sigma[0] & 0xff | (sigma[1] & 0xff) << 8 | (sigma[2] & 0xff) << 16 | (sigma[3] & 0xff) << 24;
-        var j1 = k[0] & 0xff | (k[1] & 0xff) << 8 | (k[2] & 0xff) << 16 | (k[3] & 0xff) << 24;
-        var j2 = k[4] & 0xff | (k[5] & 0xff) << 8 | (k[6] & 0xff) << 16 | (k[7] & 0xff) << 24;
-        var j3 = k[8] & 0xff | (k[9] & 0xff) << 8 | (k[10] & 0xff) << 16 | (k[11] & 0xff) << 24;
-        var j4 = k[12] & 0xff | (k[13] & 0xff) << 8 | (k[14] & 0xff) << 16 | (k[15] & 0xff) << 24;
-        var j5 = sigma[4] & 0xff | (sigma[5] & 0xff) << 8 | (sigma[6] & 0xff) << 16 | (sigma[7] & 0xff) << 24;
-        var j6 = p[0] & 0xff | (p[1] & 0xff) << 8 | (p[2] & 0xff) << 16 | (p[3] & 0xff) << 24;
-        var j7 = p[4] & 0xff | (p[5] & 0xff) << 8 | (p[6] & 0xff) << 16 | (p[7] & 0xff) << 24;
-        var j8 = p[8] & 0xff | (p[9] & 0xff) << 8 | (p[10] & 0xff) << 16 | (p[11] & 0xff) << 24;
-        var j9 = p[12] & 0xff | (p[13] & 0xff) << 8 | (p[14] & 0xff) << 16 | (p[15] & 0xff) << 24;
-        var j10 = sigma[8] & 0xff | (sigma[9] & 0xff) << 8 | (sigma[10] & 0xff) << 16 | (sigma[11] & 0xff) << 24;
-        var j11 = k[16] & 0xff | (k[17] & 0xff) << 8 | (k[18] & 0xff) << 16 | (k[19] & 0xff) << 24;
-        var j12 = k[20] & 0xff | (k[21] & 0xff) << 8 | (k[22] & 0xff) << 16 | (k[23] & 0xff) << 24;
-        var j13 = k[24] & 0xff | (k[25] & 0xff) << 8 | (k[26] & 0xff) << 16 | (k[27] & 0xff) << 24;
-        var j14 = k[28] & 0xff | (k[29] & 0xff) << 8 | (k[30] & 0xff) << 16 | (k[31] & 0xff) << 24;
-        var j15 = sigma[12] & 0xff | (sigma[13] & 0xff) << 8 | (sigma[14] & 0xff) << 16 | (sigma[15] & 0xff) << 24;
+        int j0 = sigma[0] & 0xff | (sigma[1] & 0xff) << 8 | (sigma[2] & 0xff) << 16 | (sigma[3] & 0xff) << 24;
+        int j1 = k[0] & 0xff | (k[1] & 0xff) << 8 | (k[2] & 0xff) << 16 | (k[3] & 0xff) << 24;
+        int j2 = k[4] & 0xff | (k[5] & 0xff) << 8 | (k[6] & 0xff) << 16 | (k[7] & 0xff) << 24;
+        int j3 = k[8] & 0xff | (k[9] & 0xff) << 8 | (k[10] & 0xff) << 16 | (k[11] & 0xff) << 24;
+        int j4 = k[12] & 0xff | (k[13] & 0xff) << 8 | (k[14] & 0xff) << 16 | (k[15] & 0xff) << 24;
+        int j5 = sigma[4] & 0xff | (sigma[5] & 0xff) << 8 | (sigma[6] & 0xff) << 16 | (sigma[7] & 0xff) << 24;
+        int j6 = p[0] & 0xff | (p[1] & 0xff) << 8 | (p[2] & 0xff) << 16 | (p[3] & 0xff) << 24;
+        int j7 = p[4] & 0xff | (p[5] & 0xff) << 8 | (p[6] & 0xff) << 16 | (p[7] & 0xff) << 24;
+        int j8 = p[8] & 0xff | (p[9] & 0xff) << 8 | (p[10] & 0xff) << 16 | (p[11] & 0xff) << 24;
+        int j9 = p[12] & 0xff | (p[13] & 0xff) << 8 | (p[14] & 0xff) << 16 | (p[15] & 0xff) << 24;
+        int j10 = sigma[8] & 0xff | (sigma[9] & 0xff) << 8 | (sigma[10] & 0xff) << 16 | (sigma[11] & 0xff) << 24;
+        int j11 = k[16] & 0xff | (k[17] & 0xff) << 8 | (k[18] & 0xff) << 16 | (k[19] & 0xff) << 24;
+        int j12 = k[20] & 0xff | (k[21] & 0xff) << 8 | (k[22] & 0xff) << 16 | (k[23] & 0xff) << 24;
+        int j13 = k[24] & 0xff | (k[25] & 0xff) << 8 | (k[26] & 0xff) << 16 | (k[27] & 0xff) << 24;
+        int j14 = k[28] & 0xff | (k[29] & 0xff) << 8 | (k[30] & 0xff) << 16 | (k[31] & 0xff) << 24;
+        int j15 = sigma[12] & 0xff | (sigma[13] & 0xff) << 8 | (sigma[14] & 0xff) << 16 | (sigma[15] & 0xff) << 24;
 
-        var x0 = j0;
-        var x1 = j1;
-        var x2 = j2;
-        var x3 = j3;
-        var x4 = j4;
-        var x5 = j5;
-        var x6 = j6;
-        var x7 = j7;
-        var x8 = j8;
-        var x9 = j9;
-        var x10 = j10;
-        var x11 = j11;
-        var x12 = j12;
-        var x13 = j13;
-        var x14 = j14;
-        var x15 = j15;
+        int x0 = j0;
+        int x1 = j1;
+        int x2 = j2;
+        int x3 = j3;
+        int x4 = j4;
+        int x5 = j5;
+        int x6 = j6;
+        int x7 = j7;
+        int x8 = j8;
+        int x9 = j9;
+        int x10 = j10;
+        int x11 = j11;
+        int x12 = j12;
+        int x13 = j13;
+        int x14 = j14;
+        int x15 = j15;
         int u;
 
-        for (var i = 0; i < 20; i += 2) {
+        for (int i = 0; i < 20; i += 2) {
             u = x0 + x12;
             x4 ^= u << 7 | u >>> (32 - 7);
             u = x4 + x0;
@@ -234,42 +234,42 @@ public final class TweetNaclFastInstanced {
     }
 
     private void coreHSalsa20(byte[] o, byte[] p, byte[] k) {
-        var j0 = sigma[0] & 0xff | (sigma[1] & 0xff) << 8 | (sigma[2] & 0xff) << 16 | (sigma[3] & 0xff) << 24;
-        var j1 = k[0] & 0xff | (k[1] & 0xff) << 8 | (k[2] & 0xff) << 16 | (k[3] & 0xff) << 24;
-        var j2 = k[4] & 0xff | (k[5] & 0xff) << 8 | (k[6] & 0xff) << 16 | (k[7] & 0xff) << 24;
-        var j3 = k[8] & 0xff | (k[9] & 0xff) << 8 | (k[10] & 0xff) << 16 | (k[11] & 0xff) << 24;
-        var j4 = k[12] & 0xff | (k[13] & 0xff) << 8 | (k[14] & 0xff) << 16 | (k[15] & 0xff) << 24;
-        var j5 = sigma[4] & 0xff | (sigma[5] & 0xff) << 8 | (sigma[6] & 0xff) << 16 | (sigma[7] & 0xff) << 24;
-        var j6 = p[0] & 0xff | (p[1] & 0xff) << 8 | (p[2] & 0xff) << 16 | (p[3] & 0xff) << 24;
-        var j7 = p[4] & 0xff | (p[5] & 0xff) << 8 | (p[6] & 0xff) << 16 | (p[7] & 0xff) << 24;
-        var j8 = p[8] & 0xff | (p[9] & 0xff) << 8 | (p[10] & 0xff) << 16 | (p[11] & 0xff) << 24;
-        var j9 = p[12] & 0xff | (p[13] & 0xff) << 8 | (p[14] & 0xff) << 16 | (p[15] & 0xff) << 24;
-        var j10 = sigma[8] & 0xff | (sigma[9] & 0xff) << 8 | (sigma[10] & 0xff) << 16 | (sigma[11] & 0xff) << 24;
-        var j11 = k[16] & 0xff | (k[17] & 0xff) << 8 | (k[18] & 0xff) << 16 | (k[19] & 0xff) << 24;
-        var j12 = k[20] & 0xff | (k[21] & 0xff) << 8 | (k[22] & 0xff) << 16 | (k[23] & 0xff) << 24;
-        var j13 = k[24] & 0xff | (k[25] & 0xff) << 8 | (k[26] & 0xff) << 16 | (k[27] & 0xff) << 24;
-        var j14 = k[28] & 0xff | (k[29] & 0xff) << 8 | (k[30] & 0xff) << 16 | (k[31] & 0xff) << 24;
-        var j15 = sigma[12] & 0xff | (sigma[13] & 0xff) << 8 | (sigma[14] & 0xff) << 16 | (sigma[15] & 0xff) << 24;
+        int j0 = sigma[0] & 0xff | (sigma[1] & 0xff) << 8 | (sigma[2] & 0xff) << 16 | (sigma[3] & 0xff) << 24;
+        int j1 = k[0] & 0xff | (k[1] & 0xff) << 8 | (k[2] & 0xff) << 16 | (k[3] & 0xff) << 24;
+        int j2 = k[4] & 0xff | (k[5] & 0xff) << 8 | (k[6] & 0xff) << 16 | (k[7] & 0xff) << 24;
+        int j3 = k[8] & 0xff | (k[9] & 0xff) << 8 | (k[10] & 0xff) << 16 | (k[11] & 0xff) << 24;
+        int j4 = k[12] & 0xff | (k[13] & 0xff) << 8 | (k[14] & 0xff) << 16 | (k[15] & 0xff) << 24;
+        int j5 = sigma[4] & 0xff | (sigma[5] & 0xff) << 8 | (sigma[6] & 0xff) << 16 | (sigma[7] & 0xff) << 24;
+        int j6 = p[0] & 0xff | (p[1] & 0xff) << 8 | (p[2] & 0xff) << 16 | (p[3] & 0xff) << 24;
+        int j7 = p[4] & 0xff | (p[5] & 0xff) << 8 | (p[6] & 0xff) << 16 | (p[7] & 0xff) << 24;
+        int j8 = p[8] & 0xff | (p[9] & 0xff) << 8 | (p[10] & 0xff) << 16 | (p[11] & 0xff) << 24;
+        int j9 = p[12] & 0xff | (p[13] & 0xff) << 8 | (p[14] & 0xff) << 16 | (p[15] & 0xff) << 24;
+        int j10 = sigma[8] & 0xff | (sigma[9] & 0xff) << 8 | (sigma[10] & 0xff) << 16 | (sigma[11] & 0xff) << 24;
+        int j11 = k[16] & 0xff | (k[17] & 0xff) << 8 | (k[18] & 0xff) << 16 | (k[19] & 0xff) << 24;
+        int j12 = k[20] & 0xff | (k[21] & 0xff) << 8 | (k[22] & 0xff) << 16 | (k[23] & 0xff) << 24;
+        int j13 = k[24] & 0xff | (k[25] & 0xff) << 8 | (k[26] & 0xff) << 16 | (k[27] & 0xff) << 24;
+        int j14 = k[28] & 0xff | (k[29] & 0xff) << 8 | (k[30] & 0xff) << 16 | (k[31] & 0xff) << 24;
+        int j15 = sigma[12] & 0xff | (sigma[13] & 0xff) << 8 | (sigma[14] & 0xff) << 16 | (sigma[15] & 0xff) << 24;
 
-        var x0 = j0;
-        var x1 = j1;
-        var x2 = j2;
-        var x3 = j3;
-        var x4 = j4;
-        var x5 = j5;
-        var x6 = j6;
-        var x7 = j7;
-        var x8 = j8;
-        var x9 = j9;
-        var x10 = j10;
-        var x11 = j11;
-        var x12 = j12;
-        var x13 = j13;
-        var x14 = j14;
-        var x15 = j15;
+        int x0 = j0;
+        int x1 = j1;
+        int x2 = j2;
+        int x3 = j3;
+        int x4 = j4;
+        int x5 = j5;
+        int x6 = j6;
+        int x7 = j7;
+        int x8 = j8;
+        int x9 = j9;
+        int x10 = j10;
+        int x11 = j11;
+        int x12 = j12;
+        int x13 = j13;
+        int x14 = j14;
+        int x15 = j15;
         int u;
 
-        for (var i = 0; i < 20; i += 2) {
+        for (int i = 0; i < 20; i += 2) {
             u = x0 + x12;
             x4 ^= u << 7 | u >>> (32 - 7);
             u = x4 + x0;
@@ -398,8 +398,8 @@ public final class TweetNaclFastInstanced {
     private final byte[] x = new byte[64];
 
     private void cryptoStreamSalsa20Xor(byte[] c, byte[] m, long b, byte[] n, byte[] k) {
-        var cpos = 0;
-        var mpos = 0;
+        int cpos = 0;
+        int mpos = 0;
         int u;
         int i;
 

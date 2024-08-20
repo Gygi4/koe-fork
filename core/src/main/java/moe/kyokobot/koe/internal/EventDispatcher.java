@@ -19,7 +19,7 @@ public class EventDispatcher implements KoeEventListener {
         if (Objects.requireNonNull(listener) == this) {
             throw new IllegalArgumentException("Are you trying to register the dispatcher, rly?");
         }
-
+        
         listeners.add(listener);
     }
 

@@ -13,23 +13,23 @@ public class XSalsa20Poly1305LiteEncryptionMode implements EncryptionMode {
     @Override
     @SuppressWarnings("Duplicates")
     public boolean box(ByteBuf packet, int len, ByteBuf output, byte[] secretKey) {
-        for (var i = 0; i < c.length; i++) {
+        for (int i = 0; i < c.length; i++) {
             m[i] = 0;
             c[i] = 0;
         }
 
-        for (var i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             m[i + 32] = packet.readByte();
         }
 
-        var s = this.seq++;
+        int s = this.seq++;
         extendedNonce[0] = (byte) (s & 0xff);
         extendedNonce[1] = (byte) ((s >> 8) & 0xff);
         extendedNonce[2] = (byte) ((s >> 16) & 0xff);
         extendedNonce[3] = (byte) ((s >> 24) & 0xff);
 
         if (0 == nacl.cryptoSecretboxXSalsa20Poly1305(c, m, len + 32, extendedNonce, secretKey)) {
-            for (var i = 0; i < (len + 16); i++) {
+            for (int i = 0; i < (len + 16); i++) {
                 output.writeByte(c[i + 16]);
             }
             output.writeIntLE(s);

@@ -7,8 +7,8 @@ import moe.kyokobot.koe.gateway.GatewayVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,7 +58,7 @@ public class KoeClientImpl implements KoeClient {
     @Override
     public void close() {
         if (!connections.isEmpty()) {
-            var guilds = new ArrayList<>(connections.keySet());
+            var guilds = List.copyOf(connections.keySet());
             guilds.forEach(this::destroyConnection);
         }
     }
