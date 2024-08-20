@@ -1,6 +1,7 @@
 package moe.kyokobot.koe.crypto;
 
 import io.netty.buffer.ByteBuf;
+import moe.kyokobot.koe.codec.OpusCodec;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -12,8 +13,8 @@ public class AES256GCMEncryptionMode implements EncryptionMode {
     private static final int GCM_TAG_LENGTH = 16;
 
     private final byte[] extendedNonce = new byte[12];
-    private final byte[] m = new byte[1276];
-    private final byte[] c = new byte[1276 + GCM_TAG_LENGTH];
+    private final byte[] m = new byte[OpusCodec.MAX_FRAME_SIZE];
+    private final byte[] c = new byte[OpusCodec.MAX_FRAME_SIZE + GCM_TAG_LENGTH];
     private final byte[] rtpHeader = new byte[12];
     private int seq = 0x80000000;
 
@@ -29,7 +30,7 @@ public class AES256GCMEncryptionMode implements EncryptionMode {
 
     @Override
     @SuppressWarnings("Duplicates")
-    public boolean box(ByteBuf packet, int len, ByteBuf output, byte[] secretKey) {
+    public boolean encrypt(ByteBuf packet, int len, ByteBuf output, byte[] secretKey) {
         for (int i = 0; i < len; i++) {
             m[i] = packet.readByte();
         }

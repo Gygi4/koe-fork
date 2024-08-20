@@ -17,7 +17,7 @@ public class XChaCha20Poly1305EncryptionMode implements EncryptionMode {
 
     @Override
     @SuppressWarnings("Duplicates")
-    public boolean box(ByteBuf packet, int len, ByteBuf output, byte[] secretKey) {
+    public boolean encrypt(ByteBuf packet, int len, ByteBuf output, byte[] secretKey) {
         byte[] m = new byte[len];
 
         for (int i = 0; i < len; i++) {

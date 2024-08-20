@@ -46,7 +46,7 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
 
     protected EventExecutor eventExecutor;
     protected Channel channel;
-    protected int connectAttempt = 0;
+    protected int reconnectAttempts = 0;
     protected boolean resumable = false;
     private boolean open = false;
     private boolean closed = false;
@@ -73,7 +73,7 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
         if (connectFuture.isDone()) return connectFuture;
 
         var future = new CompletableFuture<Void>();
-        logger.debug("Connecting to {}, attempt {}/3", websocketURI, connectAttempt);
+        logger.debug("Connecting to {}, attempt {}/3", websocketURI, reconnectAttempts);
 
         var chFuture = bootstrap.connect(websocketURI.getHost(), websocketURI.getPort() == -1 ? 443 : websocketURI.getPort());
         chFuture.addListener(new NettyFutureWrapper<>(future));
@@ -120,7 +120,7 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
         if (!closed) {
             closed = true;
 
-            if (connectAttempt <= 3) {
+            if (reconnectAttempts <= 3) {
                 switch (code) {
                     case 1001: // Going away or CloudFlare WebSocket proxy restarting
                     case 1006: // Abnormal closure
@@ -129,7 +129,7 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
                     case 4900: // Koe: Reconnect
                         connectFuture = new CompletableFuture<>();
                         start();
-                        connectAttempt++;
+                        reconnectAttempts++;
                         break;
                     default:
                         connection.getDispatcher().gatewayClosed(code, reason, remote);

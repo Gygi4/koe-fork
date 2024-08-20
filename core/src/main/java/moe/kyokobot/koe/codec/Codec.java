@@ -104,12 +104,6 @@ public abstract class Codec {
             }
         }
 
-        for (var codec : DefaultCodecs.videoCodecs.values()) {
-            if (codec.getPayloadType() == payloadType) {
-                return codec;
-            }
-        }
-
         return null;
     }
 }
