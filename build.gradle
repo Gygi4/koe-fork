@@ -41,9 +41,9 @@ subprojects {
 
     repositories {
         mavenLocal()
-
         mavenCentral()
-        jcenter()
+
+        maven { url "https://maven.lavalink.dev/releases" }
         maven { url "https://jitpack.io/" }
     }
 
