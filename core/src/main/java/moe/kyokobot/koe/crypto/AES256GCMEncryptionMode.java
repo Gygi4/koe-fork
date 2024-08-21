@@ -31,18 +31,16 @@ public class AES256GCMEncryptionMode implements EncryptionMode {
     @Override
     @SuppressWarnings("Duplicates")
     public boolean encrypt(ByteBuf packet, int len, ByteBuf output, byte[] secretKey) {
-        for (int i = 0; i < len; i++) {
-            m[i] = packet.readByte();
-        }
+        packet.readBytes(m);
 
-        int s = this.seq++;
+        var s = this.seq++;
         extendedNonce[0] = (byte) (s & 0xff);
         extendedNonce[1] = (byte) ((s >> 8) & 0xff);
         extendedNonce[2] = (byte) ((s >> 16) & 0xff);
         extendedNonce[3] = (byte) ((s >> 24) & 0xff);
 
-        GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH * 8, extendedNonce);
-        SecretKeySpec keySpec = new SecretKeySpec(secretKey, "AES");
+        var spec = new GCMParameterSpec(GCM_TAG_LENGTH * 8, extendedNonce);
+        var keySpec = new SecretKeySpec(secretKey, "AES");
 
         // RTP Header already written to the output buffer
         output.readBytes(rtpHeader);
@@ -56,7 +54,7 @@ public class AES256GCMEncryptionMode implements EncryptionMode {
             return false;
         }
 
-        for (int i = 0; i < len + GCM_TAG_LENGTH; i++) {
+        for (var i = 0; i < len + GCM_TAG_LENGTH; i++) {
             output.writeByte(c[i]);
         }
 

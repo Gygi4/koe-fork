@@ -18,13 +18,11 @@ public class XChaCha20Poly1305EncryptionMode implements EncryptionMode {
     @Override
     @SuppressWarnings("Duplicates")
     public boolean encrypt(ByteBuf packet, int len, ByteBuf output, byte[] secretKey) {
-        byte[] m = new byte[len];
+        var m = new byte[len];
 
-        for (int i = 0; i < len; i++) {
-            m[i] = packet.readByte();
-        }
+        packet.readBytes(m);
 
-        int s = this.seq++;
+        var s = this.seq++;
         extendedNonce[0] = (byte) (s & 0xff);
         extendedNonce[1] = (byte) ((s >> 8) & 0xff);
         extendedNonce[2] = (byte) ((s >> 16) & 0xff);
