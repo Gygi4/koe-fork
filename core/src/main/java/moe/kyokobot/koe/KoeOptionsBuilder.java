@@ -26,7 +26,7 @@ public class KoeOptionsBuilder {
     private boolean highPacketPriority;
 
     KoeOptionsBuilder() {
-        boolean epoll = Epoll.isAvailable();
+        var epoll = Epoll.isAvailable();
         this.eventLoopGroup = epoll
                 ? new EpollEventLoopGroup()
                 : new NioEventLoopGroup();

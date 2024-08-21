@@ -12,7 +12,7 @@ public interface EncryptionMode {
     String getName();
 
     static String select(List<String> modes) throws UnsupportedEncryptionModeException {
-        for (String mode : modes) {
+        for (var mode : modes) {
             var impl = DefaultEncryptionModes.encryptionModes.get(mode);
 
             if (impl != null) {

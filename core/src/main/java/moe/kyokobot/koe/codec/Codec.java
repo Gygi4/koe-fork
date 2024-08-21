@@ -59,7 +59,7 @@ public abstract class Codec {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Codec that = (Codec) o;
+        var that = (Codec) o;
         return payloadType == that.payloadType && type == that.type;
     }
 

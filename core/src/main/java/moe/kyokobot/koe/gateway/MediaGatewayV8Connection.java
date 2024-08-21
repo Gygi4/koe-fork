@@ -59,7 +59,7 @@ public class MediaGatewayV8Connection extends AbstractMediaGatewayConnection {
         switch (op) {
             case Op.HELLO: {
                 var data = object.getObject("d");
-                int interval = data.getInt("heartbeat_interval");
+                var interval = data.getInt("heartbeat_interval");
 
                 logger.debug("Received HELLO, heartbeat interval: {}", interval);
                 setupHeartbeats(interval);

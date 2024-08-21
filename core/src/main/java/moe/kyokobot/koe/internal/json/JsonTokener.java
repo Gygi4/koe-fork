@@ -63,8 +63,8 @@ final class JsonTokener {
 
         @Override
         public int read(@NotNull char[] cbuf, int off, int len) throws IOException {
-            int r = buffered.read(buf, off, len);
-            for (int i = off; i < off + r; i++)
+            var r = buffered.read(buf, off, len);
+            for (var i = off; i < off + r; i++)
                 cbuf[i] = (char) buf[i];
             return r;
         }
@@ -85,8 +85,8 @@ final class JsonTokener {
 
         @Override
         public int read(@NotNull char[] cbuf, int off, int len) {
-            int avail = buf.readableBytes();
-            for (int i = off; i < off + avail; i++) {
+            var avail = buf.readableBytes();
+            for (var i = off; i < off + avail; i++) {
                 cbuf[i] = (char) buf.readByte();
             }
             return avail;
@@ -111,14 +111,14 @@ final class JsonTokener {
     }
 
     JsonTokener(InputStream stm) throws JsonParserException {
-        final InputStream buffered = (stm instanceof BufferedInputStream || stm instanceof ByteArrayInputStream)
+        final var buffered = (stm instanceof BufferedInputStream || stm instanceof ByteArrayInputStream)
                 ? stm
                 : new BufferedInputStream(stm);
         buffered.mark(4);
 
         try {
             Charset charset;
-            int[] sig = new int[]{buffered.read(), buffered.read(), buffered.read(), buffered.read()};
+            var sig = new int[]{buffered.read(), buffered.read(), buffered.read(), buffered.read()};
             // Encoding detection based on http://www.ietf.org/rfc/rfc4627.txt
             if (sig[0] == 0xEF && sig[1] == 0xBB && sig[2] == 0xBF) {
                 buffered.reset();
@@ -179,7 +179,7 @@ final class JsonTokener {
             throw createHelpfulException(first, expected, 0);
         }
 
-        for (int i = 0; i < expected.length; i++)
+        for (var i = 0; i < expected.length; i++)
             if (buffer[index++] != expected[i])
                 throw createHelpfulException(first, expected, i);
 
@@ -212,16 +212,16 @@ final class JsonTokener {
 
         outer:
         while (true) {
-            int n = ensureBuffer(BUFFER_ROOM);
+            var n = ensureBuffer(BUFFER_ROOM);
             if (n == 0)
                 break outer;
 
-            for (int i = 0; i < n; i++) {
-                char nc = buffer[index];
+            for (var i = 0; i < n; i++) {
+                var nc = buffer[index];
                 if (!isDigitCharacter(nc))
                     break outer;
 
-                int ns = -1;
+                var ns = -1;
                 sw:
                 switch (state) {
                     case 1: // start leading negative
@@ -313,12 +313,12 @@ final class JsonTokener {
 
         start:
         while (true) {
-            int n = ensureBuffer(BUFFER_ROOM);
+            var n = ensureBuffer(BUFFER_ROOM);
             if (n == 0)
                 throw createParseException(null, "String was not terminated before end of input", true);
 
-            for (int i = 0; i < n; i++) {
-                char c = stringChar();
+            for (var i = 0; i < n; i++) {
+                var c = stringChar();
                 if (c == '"') {
                     fixupAfterRawBufferRead();
                     reusableBuffer.append(buffer, index - i - 1, i);
@@ -336,13 +336,13 @@ final class JsonTokener {
 
         outer:
         while (true) {
-            int n = ensureBuffer(BUFFER_ROOM);
+            var n = ensureBuffer(BUFFER_ROOM);
             if (n == 0)
                 throw createParseException(null, "String was not terminated before end of input", true);
 
-            int end = index + n;
+            var end = index + n;
             while (index < end) {
-                char c = stringChar();
+                var c = stringChar();
 
                 if (utf8 && (c & 0x80) != 0) {
                     // If it's a UTF-8 codepoint, we know it won't have special meaning
@@ -355,7 +355,7 @@ final class JsonTokener {
                         fixupAfterRawBufferRead();
                         return;
                     case '\\':
-                        char escape = buffer[index++];
+                        var escape = buffer[index++];
                         switch (escape) {
                             case 'b':
                                 reusableBuffer.append('\b');
@@ -378,9 +378,9 @@ final class JsonTokener {
                                 reusableBuffer.append(escape);
                                 break;
                             case 'u':
-                                int escaped = 0;
+                                var escaped = 0;
 
-                                for (int j = 0; j < 4; j++) {
+                                for (var j = 0; j < 4; j++) {
                                     escaped <<= 4;
                                     int digit = buffer[index++];
                                     if (digit >= '0' && digit <= '9') {
@@ -462,7 +462,7 @@ final class JsonTokener {
                         break;
                     case 2:
                         // TODO: \uFFFD (replacement char)
-                        int codepoint = (c & 3) << 24 | (buffer[index++] & 0x3f) << 18 | (buffer[index++] & 0x3f) << 12
+                        var codepoint = (c & 3) << 24 | (buffer[index++] & 0x3f) << 18 | (buffer[index++] & 0x3f) << 12
                                 | (buffer[index++] & 0x3f) << 6 | (buffer[index++] & 0x3f);
                         throw createParseException(null,
                                 "Unable to represent codepoint 0x" + Integer.toHexString(codepoint)
@@ -490,7 +490,7 @@ final class JsonTokener {
      * Advances a character, throwing if it is illegal in the context of a JSON string.
      */
     private char stringChar() throws JsonParserException {
-        char c = buffer[index++];
+        var c = buffer[index++];
         if (c < 32)
             throwControlCharacterException(c);
         return c;
@@ -533,7 +533,7 @@ final class JsonTokener {
      */
     private boolean refillBuffer() throws JsonParserException {
         try {
-            int r = reader.read(buffer, 0, buffer.length);
+            var r = reader.read(buffer, 0, buffer.length);
             if (r <= 0) {
                 return true;
             }
@@ -571,7 +571,7 @@ final class JsonTokener {
         }
         try {
             while (buffer.length > bufferLength) {
-                int r = reader.read(buffer, bufferLength, buffer.length - bufferLength);
+                var r = reader.read(buffer, bufferLength, buffer.length - bufferLength);
                 if (r <= 0) {
                     return bufferLength - index;
                 }
@@ -627,8 +627,8 @@ final class JsonTokener {
         int n;
         do {
             n = ensureBuffer(BUFFER_ROOM);
-            for (int i = 0; i < n; i++) {
-                char c = buffer[index];
+            for (var i = 0; i < n; i++) {
+                var c = buffer[index];
                 if (!isWhitespace(c)) {
                     fixupAfterRawBufferRead();
                     return;
@@ -649,7 +649,7 @@ final class JsonTokener {
      * numbers.
      */
     int advanceToToken() throws JsonParserException {
-        int c = advanceChar();
+        var c = advanceChar();
         while (isWhitespace(c))
             c = advanceChar();
 
@@ -723,7 +723,7 @@ final class JsonTokener {
     }
 
     int tokenChar() throws JsonParserException {
-        int c = advanceChar();
+        var c = advanceChar();
         while (isWhitespace(c))
             c = advanceChar();
         return c;
@@ -743,7 +743,7 @@ final class JsonTokener {
     JsonParserException createHelpfulException(char first, char[] expected, int failurePosition)
             throws JsonParserException {
         // Build the first part of the token
-        StringBuilder errorToken = new StringBuilder(first
+        var errorToken = new StringBuilder(first
                 + (expected == null ? "" : new String(expected, 0, failurePosition)));
 
         // Consume the whole pseudo-token to make a better error message
@@ -762,7 +762,7 @@ final class JsonTokener {
             return new JsonParserException(e, message + " on line " + linePos + ", char " + tokenCharPos,
                     linePos, tokenCharPos, tokenCharOffset);
         else {
-            int charPos = Math.max(1, index + charOffset - rowPos - utf8adjust);
+            var charPos = Math.max(1, index + charOffset - rowPos - utf8adjust);
             return new JsonParserException(e, message + " on line " + linePos + ", char " + charPos, linePos, charPos,
                     index + charOffset);
         }

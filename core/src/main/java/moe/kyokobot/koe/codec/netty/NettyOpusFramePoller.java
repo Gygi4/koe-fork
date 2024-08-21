@@ -55,10 +55,10 @@ public class NettyOpusFramePoller extends AbstractFramePoller {
             // ugly but it's the hottest path in Koe and Java is a shit language.
             if (sender != null && handler != null && sender.canSendFrame(codec)) {
                 var buf = allocator.buffer();
-                int start = buf.writerIndex();
+                var start = buf.writerIndex();
                 // opus codec doesn't need framing, we don't handle multiple packet cases.
                 sender.retrieve(codec, buf, timestamp);
-                int len = buf.writerIndex() - start;
+                var len = buf.writerIndex() - start;
                 if (len != 0) {
                     handler.sendFrame(OpusCodec.PAYLOAD_TYPE, timestamp.get(), buf, len, false);
                 }
@@ -68,7 +68,7 @@ public class NettyOpusFramePoller extends AbstractFramePoller {
             logger.error("Sending frame failed", e);
         }
 
-        long frameDelay = 20 - (System.currentTimeMillis() - lastFrame);
+        var frameDelay = 20 - (System.currentTimeMillis() - lastFrame);
 
         if (frameDelay > 0) {
             eventLoop.schedule(this::loop, frameDelay, TimeUnit.MILLISECONDS);

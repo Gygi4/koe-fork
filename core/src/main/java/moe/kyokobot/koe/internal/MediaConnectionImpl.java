@@ -140,7 +140,7 @@ public class MediaConnectionImpl implements MediaConnection {
             throw new IllegalArgumentException("Specified codec must be an audio codec!");
         }
 
-        boolean wasPolling = this.audioPoller != null && this.audioPoller.isPolling();
+        var wasPolling = this.audioPoller != null && this.audioPoller.isPolling();
         this.stopAudioFramePolling();
 
         this.audioCodec = audioCodec;
@@ -190,7 +190,7 @@ public class MediaConnectionImpl implements MediaConnection {
             throw new IllegalArgumentException("Specified codec must be an video codec!");
         }
 
-        boolean wasPolling = videoPoller != null && videoPoller.isPolling();
+        var wasPolling = videoPoller != null && videoPoller.isPolling();
         this.stopVideoFramePolling();
 
         this.videoCodec = videoCodec;
