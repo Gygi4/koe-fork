@@ -1,64 +1,48 @@
 package moe.kyokobot.koe.crypto;
 
 import io.netty.buffer.ByteBuf;
-import moe.kyokobot.koe.codec.OpusCodec;
-
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.NoSuchAlgorithmException;
+import com.google.crypto.tink.aead.internal.InsecureNonceAesGcmJce;
 
 public class AES256GCMEncryptionMode implements EncryptionMode {
-    private static final int GCM_TAG_LENGTH = 16;
+    private static final int NONCE_BYTES_LENGTH = 12;
 
-    private final byte[] extendedNonce = new byte[12];
-    private final byte[] m = new byte[OpusCodec.MAX_FRAME_SIZE];
-    private final byte[] c = new byte[OpusCodec.MAX_FRAME_SIZE + GCM_TAG_LENGTH];
-    private final byte[] rtpHeader = new byte[12];
+    private final byte[] extendedNonce = new byte[NONCE_BYTES_LENGTH];
+    private final byte[] associatedData = new byte[NONCE_BYTES_LENGTH];
+
+    private InsecureNonceAesGcmJce cipher;
     private int seq = 0x80000000;
-
-    private final Cipher cipher;
-
-    public AES256GCMEncryptionMode() {
-        try {
-            cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     @SuppressWarnings("Duplicates")
     public boolean encrypt(ByteBuf packet, int len, ByteBuf output, byte[] secretKey) {
+        var m = new byte[len];
+        byte[] c;
+
         packet.readBytes(m);
 
         var s = this.seq++;
+
         extendedNonce[0] = (byte) (s & 0xff);
         extendedNonce[1] = (byte) ((s >> 8) & 0xff);
         extendedNonce[2] = (byte) ((s >> 16) & 0xff);
         extendedNonce[3] = (byte) ((s >> 24) & 0xff);
 
-        var spec = new GCMParameterSpec(GCM_TAG_LENGTH * 8, extendedNonce);
-        var keySpec = new SecretKeySpec(secretKey, "AES");
-
         // RTP Header already written to the output buffer
-        output.readBytes(rtpHeader);
+        output.readBytes(associatedData);
         output.resetReaderIndex();
 
         try {
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec, spec);
-            cipher.updateAAD(rtpHeader, 0, 12);
-            cipher.doFinal(m, 0, len, c, 0);
+            if (cipher == null)
+                cipher = new InsecureNonceAesGcmJce(secretKey);
+
+            c = cipher.encrypt(extendedNonce, m, associatedData);
         } catch (Exception e) {
             return false;
         }
 
-        for (var i = 0; i < len + GCM_TAG_LENGTH; i++) {
-            output.writeByte(c[i]);
-        }
-
+        output.writeBytes(c);
         output.writeIntLE(s);
+
         return true;
     }
 
