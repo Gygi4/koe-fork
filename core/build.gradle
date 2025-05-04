@@ -1,4 +1,4 @@
-ext.nettyVersion = '4.1.119.Final'
+ext.nettyVersion = '4.1.121.Final'
 
 dependencies {
     api group: 'io.netty', name: 'netty-transport', version: nettyVersion
