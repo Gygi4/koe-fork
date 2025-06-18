@@ -198,13 +198,6 @@ public class MediaGatewayV8Connection extends AbstractMediaGatewayConnection {
                         .add("rtc_connection_id", rtcConnectionId.toString())
                         .add("data", udpInfo)
                         .combine(udpInfo));
-
-                this.updateSpeaking(0);
-
-                sendInternalPayload(Op.VIDEO, new JsonObject()
-                        .add("audio_ssrc", ssrc)
-                        .add("video_ssrc", 0)
-                        .add("rtx_ssrc", 0));
             });
 
             connection.setConnectionHandler(conn);
