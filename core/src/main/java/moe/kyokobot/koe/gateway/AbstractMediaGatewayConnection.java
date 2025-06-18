@@ -55,10 +55,15 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
                                           @NotNull VoiceServerInfo voiceServerInfo,
                                           int version) {
         try {
+            var endpoint = voiceServerInfo.getEndpoint();
+
+            if (connection.getOptions().isEnableWSSPortOverride()) {
+                endpoint = stripPort80(endpoint);
+            }
+
             this.connection = Objects.requireNonNull(connection);
             this.voiceServerInfo = Objects.requireNonNull(voiceServerInfo);
-            this.websocketURI = new URI(String.format("wss://%s/?v=%d",
-                    voiceServerInfo.getEndpoint().replace(":80", ""), version));
+            this.websocketURI = new URI(String.format("wss://%s/?v=%d", endpoint, version));
             this.bootstrap = NettyBootstrapFactory.socket(connection.getOptions())
                     .handler(new WebSocketInitializer());
             this.sslContext = SslContextBuilder.forClient().build();
@@ -66,6 +71,12 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
         } catch (SSLException | URISyntaxException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Nullable
+    @Override
+    public MediaValve getValve() {
+        return null;
     }
 
     @Override
@@ -101,7 +112,7 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
     @Override
     public void reconnect() {
         if (open) {
-            close(4900, "Koe: Reconnect");
+            close(CloseCode.KOE_RECONNECT, "Koe: Reconnect");
         }
     }
 
@@ -122,11 +133,23 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
 
             if (reconnectAttempts <= 3) {
                 switch (code) {
-                    case 1001: // Going away or CloudFlare WebSocket proxy restarting
-                    case 1006: // Abnormal closure
-                    case 4000: // Internal error
-                    case 4015: // Voice server crashed
-                    case 4900: // Koe: Reconnect
+                    case CloseCode.GOING_AWAY:
+                    case CloseCode.ABNORMAL_CLOSURE:
+                    case CloseCode.INTERNAL_ERROR:
+                    case CloseCode.UNKNOWN_OPCODE:
+                    case CloseCode.FAILED_TO_DECODE_PAYLOAD:
+                    case CloseCode.NOT_AUTHENTICATED:
+                    case CloseCode.AUTHENTICATION_FAILED:
+                    case CloseCode.ALREADY_AUTHENTICATED:
+                    case CloseCode.SESSION_NO_LONGER_VALID:
+                    case CloseCode.SESSION_TIMEOUT:
+                    case CloseCode.SERVER_NOT_FOUND:
+                    case CloseCode.UNKNOWN_PROTOCOL:
+                    case CloseCode.VOICE_SERVER_CRASHED:
+                    case CloseCode.UNKNOWN_ENCRYPTION_MODE:
+                    case CloseCode.BAD_REQUEST:
+                    case CloseCode.RATE_LIMIT_EXCEEDED:
+                    case CloseCode.KOE_RECONNECT:
                         connectFuture = new CompletableFuture<>();
                         start();
                         reconnectAttempts++;
@@ -246,5 +269,13 @@ public abstract class AbstractMediaGatewayConnection implements MediaGatewayConn
             pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
             pipeline.addLast("handler", new WebSocketClientHandler());
         }
+    }
+
+    protected static String stripPort80(String endpoint) {
+        if (endpoint.endsWith(":80")) {
+            return endpoint.substring(0, endpoint.length() - 3);
+        }
+
+        return endpoint;
     }
 }

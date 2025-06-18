@@ -51,6 +51,12 @@ public class MediaConnectionImpl implements MediaConnection {
         return conn.start().thenAccept(nothing -> {
             MediaConnectionImpl.this.info = info;
             MediaConnectionImpl.this.gatewayConnection = conn;
+
+            var valve = conn.getValve();
+
+            if (valve != null && getOptions().isDeafened()) {
+                valve.setDeafen(true);
+            }
         });
     }
 

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -19,9 +20,11 @@ import java.util.stream.Collectors;
 public class MediaGatewayV8Connection extends AbstractMediaGatewayConnection {
     private static final Logger logger = LoggerFactory.getLogger(MediaGatewayV8Connection.class);
 
+    private final MediaValve mediaValve = new MediaValve(this);
     private int ssrc;
     private SocketAddress address;
     private List<String> encryptionModes;
+    private UUID rtcConnectionId;
     private ScheduledFuture<?> heartbeatFuture;
     private int seq = -1;
 
@@ -39,6 +42,12 @@ public class MediaGatewayV8Connection extends AbstractMediaGatewayConnection {
                 .addAsString("user_id", connection.getClient().getClientId())
                 .add("session_id", voiceServerInfo.getSessionId())
                 .add("token", voiceServerInfo.getToken()));
+    }
+
+    @Nullable
+    @Override
+    public MediaValve getValve() {
+        return this.mediaValve;
     }
 
     @Override
@@ -80,6 +89,7 @@ public class MediaGatewayV8Connection extends AbstractMediaGatewayConnection {
 
                 connection.getDispatcher().gatewayReady((InetSocketAddress) address, ssrc);
                 logger.debug("Got READY, ssrc: {}", ssrc);
+                mediaValve.sendToGateway();
                 selectProtocol("udp");
                 break;
             }
@@ -89,7 +99,8 @@ public class MediaGatewayV8Connection extends AbstractMediaGatewayConnection {
                 logger.debug("Got session description: {}", data);
 
                 if (connection.getConnectionHandler() == null) {
-                    logger.warn("Received session description before protocol selection?");
+                    logger.warn("Received session description before protocol selection? (connection id = {})",
+                            this.rtcConnectionId);
                     break;
                 }
 
@@ -107,7 +118,9 @@ public class MediaGatewayV8Connection extends AbstractMediaGatewayConnection {
                 logger.debug("Resumed successfully");
                 break;
             }
-            case Op.CLIENT_CONNECT: {
+            case Op.VIDEO: {
+                mediaValve.handleEvent(object);
+
                 var data = object.getObject("d");
                 var user = data.getString("user_id");
                 var audioSsrc = data.getInt("audio_ssrc", 0);
@@ -165,6 +178,9 @@ public class MediaGatewayV8Connection extends AbstractMediaGatewayConnection {
         var mode = EncryptionMode.select(encryptionModes);
         logger.debug("Selected preferred encryption mode: {}", mode);
 
+        rtcConnectionId = UUID.randomUUID();
+        logger.debug("Generated new connection id: {}", rtcConnectionId);
+
         // known values: ["udp", "webrtc"]
         if (protocol.equals("udp")) {
             var conn = new DiscordUDPConnection(connection, address, ssrc);
@@ -179,8 +195,16 @@ public class MediaGatewayV8Connection extends AbstractMediaGatewayConnection {
 
                 sendInternalPayload(Op.SELECT_PROTOCOL, new JsonObject()
                         .add("protocol", "udp")
+                        .add("rtc_connection_id", rtcConnectionId.toString())
                         .add("data", udpInfo)
                         .combine(udpInfo));
+
+                this.updateSpeaking(0);
+
+                sendInternalPayload(Op.VIDEO, new JsonObject()
+                        .add("audio_ssrc", ssrc)
+                        .add("video_ssrc", 0)
+                        .add("rtx_ssrc", 0));
             });
 
             connection.setConnectionHandler(conn);

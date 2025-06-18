@@ -10,6 +10,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * KoeOptions is a class that holds various options for configuring the Koe client.
+ *
+ * @see KoeOptionsBuilder The builder class for explanation of all options defined in this class.
+ */
 public class KoeOptions {
     private final EventLoopGroup eventLoopGroup;
     private final Class<? extends SocketChannel> socketChannelClass;
@@ -18,6 +23,8 @@ public class KoeOptions {
     private final GatewayVersion gatewayVersion;
     private final FramePollerFactory framePollerFactory;
     private final boolean highPacketPriority;
+    private final boolean deafened;
+    private final boolean enableWSSPortOverride;
 
     public KoeOptions(@NotNull EventLoopGroup eventLoopGroup,
                       @NotNull Class<? extends SocketChannel> socketChannelClass,
@@ -25,7 +32,10 @@ public class KoeOptions {
                       @NotNull ByteBufAllocator byteBufAllocator,
                       @NotNull GatewayVersion gatewayVersion,
                       @NotNull FramePollerFactory framePollerFactory,
-                      boolean highPacketPriority) {
+                      boolean highPacketPriority,
+                      boolean deafened,
+                      boolean enableWSSPortOverride
+    ) {
         this.eventLoopGroup = Objects.requireNonNull(eventLoopGroup);
         this.socketChannelClass = Objects.requireNonNull(socketChannelClass);
         this.datagramChannelClass = Objects.requireNonNull(datagramChannelClass);
@@ -33,6 +43,42 @@ public class KoeOptions {
         this.gatewayVersion = Objects.requireNonNull(gatewayVersion);
         this.framePollerFactory = Objects.requireNonNull(framePollerFactory);
         this.highPacketPriority = highPacketPriority;
+        this.deafened = deafened;
+        this.enableWSSPortOverride = enableWSSPortOverride;
+    }
+
+    /**
+     * @deprecated Use {@link KoeOptionsBuilder} instead. Provided for binary compatibility with older versions.
+     */
+    @Deprecated(forRemoval = true, since = "2.2.0")
+    public KoeOptions(
+            @NotNull EventLoopGroup eventLoopGroup,
+            @NotNull Class<? extends SocketChannel> socketChannelClass,
+            @NotNull Class<? extends DatagramChannel> datagramChannelClass,
+            @NotNull ByteBufAllocator byteBufAllocator,
+            @NotNull GatewayVersion gatewayVersion,
+            @NotNull FramePollerFactory framePollerFactory,
+            boolean highPacketPriority,
+            boolean deafened
+    ) {
+        this(eventLoopGroup, socketChannelClass, datagramChannelClass, byteBufAllocator, gatewayVersion,
+                framePollerFactory, highPacketPriority, deafened, true);
+    }
+
+    /**
+     * @deprecated Use {@link KoeOptionsBuilder} instead. Provided for binary compatibility with older versions.
+     */
+    @Deprecated(forRemoval = true, since = "2.2.0")
+    public KoeOptions(
+                      @NotNull EventLoopGroup eventLoopGroup,
+                      @NotNull Class<? extends SocketChannel> socketChannelClass,
+                      @NotNull Class<? extends DatagramChannel> datagramChannelClass,
+                      @NotNull ByteBufAllocator byteBufAllocator,
+                      @NotNull GatewayVersion gatewayVersion,
+                      @NotNull FramePollerFactory framePollerFactory,
+                      boolean highPacketPriority
+    ) {
+        this(eventLoopGroup, socketChannelClass, datagramChannelClass, byteBufAllocator, gatewayVersion, framePollerFactory, highPacketPriority, false);
     }
 
     @NotNull
@@ -67,6 +113,14 @@ public class KoeOptions {
 
     public boolean isHighPacketPriority() {
         return highPacketPriority;
+    }
+
+    public boolean isDeafened() {
+        return deafened;
+    }
+
+    public boolean isEnableWSSPortOverride() {
+        return enableWSSPortOverride;
     }
 
     /**
